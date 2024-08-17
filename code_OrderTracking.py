@@ -44,7 +44,7 @@ df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 
 # Convert dates to integer format
 df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
-sorted_dates = sorted(df['Date_Formatted'].unique())
+sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 
 
 # Row A
