@@ -16,9 +16,11 @@ st.set_page_config(layout="wide")
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-
+b1, b2, b3 = st.columns(3)
 image = Image.open('dgland_icon.png')
-st.image(image, width=100)  # Change 100 to the desired width in pixels
+b1.image(image, width=100)  # Change 100 to the desired width in pixels
+b2.selectbox('Select Category', ['Cat', 'Dog'])
+b3.selectbox('Select Brand', ['Cat', 'Dog'])
 # Row A
 a2, a3, a4 = st.columns(3)
 a2.metric("Wind", "9 mph", "-8%")
