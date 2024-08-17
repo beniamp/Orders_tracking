@@ -18,7 +18,8 @@ with open('style.css') as f:
 
 b1, b2, b3 = st.columns(3)
 image = Image.open('dgland_icon.png')
-b1.image(image, width=100)  # Change 100 to the desired width in pixels
+st.image(image, width=100)  # Change 100 to the desired width in pixels
+b1.selectbox('Select Date', ['Cat', 'Dog'])
 b2.selectbox('Select Category', ['Cat', 'Dog'])
 b3.selectbox('Select Brand', ['Cat', 'Dog'])
 # Row A
