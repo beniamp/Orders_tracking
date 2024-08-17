@@ -95,30 +95,6 @@ formatted_total_sales = "{:,}".format(current_total_sales)
 formatted_total_volume = "{:,}".format(current_total_volume)
 formatted_total_net = "{:,}".format(current_total_net)
 
-# Category filter with 'All Categories' option
-categories = ['All Categories'] + df_orders['Category'].unique().tolist()
-selected_category = st.selectbox('Select Category', categories)
-
-
-# Filter DataFrame by selected category
-if selected_category != 'All Categories':
-    filtered_df = filtered_df[filtered_df['Category'] == selected_category]
-    df_stocks = df_stocks[df_stocks['Category'] == selected_category]
-
-
-
-# Brand filter with 'All Brands' option
-if selected_category != 'All Categories':
-    brands = ['All Brands'] + filtered_df['Brand'].unique().tolist()
-else:
-    brands = ['All Brands'] + df['Brand'].unique().tolist()
-
-selected_brand = st.selectbox('Select Brand', brands)
-
-# Filter DataFrame by selected brand
-if selected_brand != 'All Brands':
-    filtered_df = filtered_df[filtered_df['Brand'] == selected_brand]
-    df_stocks = df_stocks[df_stocks['Brand'] == selected_brand]  # Apply brand filter to stocks as well
 
 
 # Row B: Metrics display
