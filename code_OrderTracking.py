@@ -19,7 +19,7 @@ with open('style.css') as f:
 
 
 # Row A
-a1, a2, a3, a4 = st.columns(3)
+a1, a2, a3, a4 = st.columns(4)
 image = Image.open('dgland_icon.png')
 a1.image(image, width=100)  # Change 100 to the desired width in pixels
 a2.metric("Wind", "9 mph", "-8%")
