@@ -3,6 +3,5 @@ pandas
 plotly
 pyodbc
 matplotlib
-numpy
 Image
 
