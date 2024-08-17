@@ -40,7 +40,7 @@ color_val = df_orders['ColorName'].unique()
 
 # Formatting date values
 df_orders['Date_Formatted'] = df_orders['Date_Formatted'].fillna('0000-00-00')
-df_orders =orders[df_orders['Date_Formatted'] != '0000-00-00']
+df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 
 # Convert dates to integer format
 df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
