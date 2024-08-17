@@ -49,7 +49,7 @@ sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 
 # Row A
 b1, b2, b3 = st.columns(3)
-b1.selectbox('Select Date', sorted_dates)
+selected_date = b1.selectbox('Select Date', sorted_dates)
 b2.selectbox('Select Category', category_val)
 b3.selectbox('Select Brand', color_val)
 # Define a helper function to get the past 7 days
