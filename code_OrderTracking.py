@@ -28,7 +28,7 @@ total_volume = df_orders['Quantity'].sum()
 total_net = df_orders['TotalNetPrice'].sum()
 
 # Unique date values
-date_val = df_orders['Date'].unique()
+date_val = df_orders['Date_Formatted'].unique()
 category_val = df_orders['Category'].unique()
 color_val = df_orders['ColorName'].unique()
 
