@@ -52,9 +52,48 @@ b1, b2, b3 = st.columns(3)
 b1.selectbox('Select Date', sorted_dates)
 b2.selectbox('Select Category', category_val)
 b3.selectbox('Select Brand', color_val)
+# Define a helper function to get the past 7 days
+def get_past_dates(date_str, days=7):
+    date_index = sorted_dates.index(date_str)
+    if date_index - (days - 1) >= 0:
+        return sorted_dates[date_index - (days - 1):date_index + 1]
+    return sorted_dates[:date_index + 1]
 
-# Row B
+# Get the past 7 days including the selected date
+past_7_days = get_past_dates(selected_date, days=7)
+
+# Get the 7 days before the last 7 days
+if len(past_7_days) >= 7:
+    past_14_days = get_past_dates(past_7_days[0], days=7)
+else:
+    past_14_days = []
+
+# Filter DataFrames
+df_current_week = df_orders[df_orders['Date_Formatted'].isin(past_7_days)]
+df_previous_week = df_orders[df_orders['Date_Formatted'].isin(past_14_days)]
+
+# Calculate metrics for current week
+current_total_sales = df_current_week['TotalPrice'].sum()
+current_total_volume = df_current_week['Quantity'].sum()
+current_total_net = df_current_week['TotalNetPrice'].sum()
+
+# Calculate metrics for previous week
+previous_total_sales = df_previous_week['TotalPrice'].sum()
+previous_total_volume = df_previous_week['Quantity'].sum()
+previous_total_net = df_previous_week['TotalNetPrice'].sum()
+
+# Calculate Growth Percentage
+sales_growth = ((current_total_sales - previous_total_sales) / previous_total_sales) * 100 if previous_total_sales else 0
+volume_growth = ((current_total_volume - previous_total_volume) / previous_total_volume) * 100 if previous_total_volume else 0
+net_growth = ((current_total_net - previous_total_net) / previous_total_net) * 100 if previous_total_net else 0
+
+# Formatting the metrics
+formatted_total_sales = "{:,}".format(current_total_sales)
+formatted_total_volume = "{:,}".format(current_total_volume)
+formatted_total_net = "{:,}".format(current_total_net)
+
+# Row B: Metrics display
 a2, a3, a4 = st.columns(3)
-a2.metric("Overall Price", formatted_total_sales, "-8%")
-a3.metric("Overall Volume", formatted_total_volume, "4%")
-a4.metric("Overal Net Price", formatted_total_net, "3%")
+a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
+a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
+a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
