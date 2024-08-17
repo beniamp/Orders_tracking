@@ -98,6 +98,8 @@ formatted_total_net = "{:,}".format(current_total_net)
 
 
 # Row B: Metrics display
+st.write(past_7_days)
+st.write(past_14_days)
 a2, a3, a4 = st.columns(3)
 a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
