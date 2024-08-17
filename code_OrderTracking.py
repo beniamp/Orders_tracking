@@ -24,8 +24,14 @@ df_orders = pd.read_csv('Orders.csv')
 
 # calculating 3 metrics in second row
 total_sales = df_orders['TotalPrice'].sum()
+formatted_total_sales = "{:,}".format(total_sales)
+
 total_volume = df_orders['Quantity'].sum()
+formatted_total_volume = "{:,}".format(total_volume)
+
 total_net = df_orders['TotalNetPrice'].sum()
+formatted_total_net = "{:,}".format(total_net)
+
 
 # Unique date values
 date_val = df_orders['Date_Formatted'].unique()
@@ -40,6 +46,6 @@ b3.selectbox('Select Brand', color_val)
 
 # Row B
 a2, a3, a4 = st.columns(3)
-a2.metric("Overall Price", total_sales, "-8%")
-a3.metric("Overall Volume", total_volume, "4%")
-a4.metric("Overal Net Price", total_net, "3%")
+a2.metric("Overall Price", formatted_total_sales, "-8%")
+a3.metric("Overall Volume", formatted_total_volume, "4%")
+a4.metric("Overal Net Price", formatted_total_net, "3%")
