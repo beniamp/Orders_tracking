@@ -59,12 +59,15 @@ def get_past_dates(date_str, days=7):
         return sorted_dates[date_index - (days - 1):date_index + 1]
     return sorted_dates[:date_index + 1]
 
+
 # Get the past 7 days including the selected date
-past_7_days = get_past_dates(selected_date, days=7)
+past_8_days = get_past_dates(selected_date, days=8)
+past_7_days = past_8_days[1:]
+
 
 # Get the 7 days before the last 7 days
 if len(past_7_days) >= 7:
-    past_14_days = get_past_dates(past_7_days[0], days=7)
+    past_14_days = get_past_dates(past_8_days[0], days=7)
 else:
     past_14_days = []
 
@@ -91,6 +94,32 @@ net_growth = ((current_total_net - previous_total_net) / previous_total_net) * 1
 formatted_total_sales = "{:,}".format(current_total_sales)
 formatted_total_volume = "{:,}".format(current_total_volume)
 formatted_total_net = "{:,}".format(current_total_net)
+
+# Category filter with 'All Categories' option
+categories = ['All Categories'] + df_orders['Category'].unique().tolist()
+selected_category = st.selectbox('Select Category', categories)
+
+
+# Filter DataFrame by selected category
+if selected_category != 'All Categories':
+    filtered_df = filtered_df[filtered_df['Category'] == selected_category]
+    df_stocks = df_stocks[df_stocks['Category'] == selected_category]
+
+
+
+# Brand filter with 'All Brands' option
+if selected_category != 'All Categories':
+    brands = ['All Brands'] + filtered_df['Brand'].unique().tolist()
+else:
+    brands = ['All Brands'] + df['Brand'].unique().tolist()
+
+selected_brand = st.selectbox('Select Brand', brands)
+
+# Filter DataFrame by selected brand
+if selected_brand != 'All Brands':
+    filtered_df = filtered_df[filtered_df['Brand'] == selected_brand]
+    df_stocks = df_stocks[df_stocks['Brand'] == selected_brand]  # Apply brand filter to stocks as well
+
 
 # Row B: Metrics display
 a2, a3, a4 = st.columns(3)
