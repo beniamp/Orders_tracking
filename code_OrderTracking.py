@@ -18,7 +18,7 @@ with open('style.css') as f:
 
 # Row A
 a1, a2, a3 = st.columns(3)
-a1.image(Image.open('dgland_icon.png'))
-a1.image(Image, width=100)  # Change 100 to the desired width in pixels
+image = a1.image(Image.open('dgland_icon.png'))
+a1.image(image, width=100)  # Change 100 to the desired width in pixels
 a2.metric("Wind", "9 mph", "-8%")
 a3.metric("Humidity", "86%", "4%")
