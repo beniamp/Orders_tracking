@@ -47,6 +47,5 @@ b3.selectbox('Select Brand', color_val)
 # Row B
 a2, a3, a4 = st.columns(3)
 a2.metric("Overall Price", formatted_total_sales, "-8%")
-#a3.metric("Overall Volume", formatted_total_volume, "4%")
-#a3.metric("Overall Volume", f"{formatted_total_volume} M", "4%")
+a3.metric("Overall Volume", formatted_total_volume, "4%")
 a4.metric("Overal Net Price", formatted_total_net, "3%")
