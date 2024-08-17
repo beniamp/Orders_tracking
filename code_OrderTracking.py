@@ -30,7 +30,7 @@ total_net = df_orders['TotalNetPrice'].sum()
 # Unique date values
 date_val = df_orders['Date'].unique()
 category_val = df_orders['Category'].unique()
-color_val = df_orders['Color'].unique()
+color_val = df_orders['ColorName'].unique()
 
 # Row A
 b1, b2, b3 = st.columns(3)
