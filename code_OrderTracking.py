@@ -30,13 +30,13 @@ total_net = df_orders['TotalNetPrice'].sum()
 # Unique date values
 date_val = df_orders['Date'].unique()
 category_val = df_orders['Category'].unique()
-brand_val = df_orders['Brand'].unique()
+color_val = df_orders['Color'].unique()
 
 # Row A
 b1, b2, b3 = st.columns(3)
 b1.selectbox('Select Date', date_val)
 b2.selectbox('Select Category', category_val)
-b3.selectbox('Select Brand', brand_val)
+b3.selectbox('Select Brand', color_val)
 
 # Row B
 a2, a3, a4 = st.columns(3)
