@@ -98,8 +98,11 @@ df_previous_week = filtered_df[filtered_df['Date_Formatted'].isin(second_past_7_
 
 # Calculate metrics
 current_total_sales = df_current_week['TotalPrice'].sum()
+formatted_total_sales = "{:,}".format(current_total_sales)
 current_total_volume = df_current_week['Quantity'].sum()
+formatted_total_sales = "{:,}".format(current_total_volume)
 current_total_net = df_current_week['TotalNetPrice'].sum()
+formatted_total_sales = "{:,}".format(current_total_net)
 
 previous_total_sales = df_previous_week['TotalPrice'].sum()
 previous_total_volume = df_previous_week['Quantity'].sum()
