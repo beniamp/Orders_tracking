@@ -129,9 +129,9 @@ a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
 # Trend Chart Sales Over Time Past 5 months
 def sales_over_time(df):
-    daily_sales = filtered_df.groupby(['Formatted_Date']).sum()['TotalPrice'].reset_index()
-    daily_sales = daily_sales.sort_values(by='Formatted_Date')
-    fig = px.line(daily_sales, x='Formatted_Date', y='TotalPrice', title='Sales Over Time')
+    daily_sales = filtered_df.groupby(['Date_Formatted']).sum()['TotalPrice'].reset_index()
+    daily_sales = daily_sales.sort_values(by='Date_Formatted')
+    fig = px.line(daily_sales, x='Date_Formatted', y='TotalPrice', title='Sales Over Time')
     fig.update_traces(line=dict(color='blue'))
     return fig
 
