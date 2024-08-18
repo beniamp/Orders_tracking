@@ -55,7 +55,9 @@ selected_category = b2.selectbox('Select Category', categories)
 b3.selectbox('Select Brand', color_val)
 
 # Filter DataFrame by selected category
-if selected_category != 'All Categories':
+if selected_category == 'All Categories':
+    filtered_df = df_orders
+else:
     filtered_df = df_orders[df_orders['Category'] == selected_category]
 
 # Define a helper function to get the past 7 days
