@@ -153,13 +153,13 @@ def sales_over_time(df, past_14_days):
     df_filtered = df[df['Date_Formatted'].isin(past_14_days)]
     
     # Group by 'Date_Formatted', 'FormattedDate_p', and 'ColorName'
-    daily_sales = df_filtered.groupby(['Date_Formatted', 'FormattedDate_p']).sum()['TotalPrice'].reset_index()
+    daily_sales = df_filtered.groupby(['Date_Formatted', 'FormattedDate_p']).sum()['Quantity'].reset_index()
     
     # Sort by date to ensure proper plotting
     daily_sales = daily_sales.sort_values(by='Date_Formatted')
     
     # Create a line plot, with different colors for each 'ColorName'
-    fig = px.line(daily_sales, x='FormattedDate_p', y='TotalPrice', title='Sales Over Time')
+    fig = px.line(daily_sales, x='FormattedDate_p', y='Quantity', title='Sales Over Time')
     
     # Customize the x-axis to show only the filtered dates
     fig.update_xaxes(type='category')
