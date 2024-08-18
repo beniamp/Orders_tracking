@@ -114,6 +114,7 @@ formatted_total_sales = "{:,}".format(current_total_sales)
 formatted_total_volume = "{:,}".format(current_total_volume)
 formatted_total_net = "{:,}".format(current_total_net)
 
+st.write(f'Domain of period time{num_days}')
 st.write(f'Current period range:{start_date_persian} to {end_date_persian}')
 st.write(f'Previous period range:{previous_start_date_persian} to {previous_end_date_persian}')
 
