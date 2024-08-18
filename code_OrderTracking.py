@@ -152,18 +152,28 @@ def sales_over_time(df, past_14_days):
     # Filter the data to include only the past 14 days
     df_filtered = df[df['Date_Formatted'].isin(past_14_days)]
     
-    # Group by 'Date_Formatted', 'FormattedDate_p', and 'ColorName'
+    # Group by 'Date_Formatted' and sum up 'Quantity'
     daily_sales = df_filtered.groupby(['Date_Formatted', 'FormattedDate_p']).sum()['Quantity'].reset_index()
     
-    # Sort by date to ensure proper plotting
-    daily_sales = daily_sales.sort_values(by='Date_Formatted')
+    # Create a DataFrame with all possible dates in the past 14 days
+    full_dates = pd.DataFrame({'Date_Formatted': past_14_days})
+    full_dates['FormattedDate_p'] = full_dates['Date_Formatted'].apply(format_persian_date)
     
-    # Create a line plot, with different colors for each 'ColorName'
-    fig = px.line(daily_sales, x='FormattedDate_p', y='Quantity', title='Sales Over Time')
+    # Merge with the actual sales data to fill missing dates with 0
+    full_sales = pd.merge(full_dates, daily_sales, on=['Date_Formatted', 'FormattedDate_p'], how='left').fillna(0)
+    
+    # Convert any NaNs in Quantity to 0
+    full_sales['Quantity'] = full_sales['Quantity'].astype(int)
+    
+    # Sort by date to ensure proper plotting
+    full_sales = full_sales.sort_values(by='Date_Formatted')
+    
+    # Create a line plot
+    fig = px.line(full_sales, x='FormattedDate_p', y='Quantity', title='Sales Over Time')
     
     # Customize the x-axis to show only the filtered dates
-    fig.update_xaxes(type='category')
-    
+    fig.update_xaxes(type='category', title_text='Date')
+
     return fig
 
 # Generate the figure
