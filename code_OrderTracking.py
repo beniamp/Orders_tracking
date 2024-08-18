@@ -124,14 +124,32 @@ a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
 
 
+filtered_df = filtered_df.dropna(subset=['Date'])
+# Customizing persian month to corresponding month name by dictionary
+persian_months = {'01': 'Far', '02': 'Ord', '03': 'Kho',
+        '04': 'Tir', '05': 'Mor', '06': 'Sha',
+        '07': 'Meh', '08': 'Aba', '09': 'Aza',
+        '10': 'Dey', '11': 'Bah', '12': 'Esf' }
 
+
+def format_persian_date(date_str):
+        if date_str is None:
+            return None
+        parts = date_str.split('-')
+        if len(parts) == 3:
+            year, month, day = parts
+            persian_month = persian_months.get(month, month)
+            return f'{persian_month} {day}'
+        return date_str
+
+filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
 
 # Trend Chart Sales Over Time Past 5 months
 def sales_over_time(df):
-    daily_sales = filtered_df.groupby(['Date_Formatted']).sum()['TotalPrice'].reset_index()
+    daily_sales = filtered_df.groupby(['Date_Formatted', FormattedDate_p]).sum()['TotalPrice'].reset_index()
     daily_sales = daily_sales.sort_values(by='Date_Formatted')
-    fig = px.line(daily_sales, x='Date_Formatted', y='TotalPrice', title='Sales Over Time')
+    fig = px.line(daily_sales, x='FormattedDate_p', y='TotalPrice', title='Sales Over Time')
     fig.update_traces(line=dict(color='blue'))
     return fig
 
