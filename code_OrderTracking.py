@@ -190,7 +190,7 @@ def sales_over_time(df, past_14_days):
     fig.add_annotation(
         x=full_sales['FormattedDate_p'].max(),
         y=average_quantity,
-        text=f'Average: {average_quantity:.f}',
+        text=f'Average: {average_quantity:.1f}',
         showarrow=False,
         yshift=10,
         font=dict(color='black')
