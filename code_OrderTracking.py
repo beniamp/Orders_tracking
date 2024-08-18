@@ -53,19 +53,22 @@ df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astyp
 sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 
 # Function to convert Persian date to Gregorian date
+# Function to convert Persian date to Gregorian date
 def persian_to_gregorian(persian_date_str):
     year, month, day = map(int, persian_date_str.split('-'))
     gregorian_date = persian.to_gregorian(year, month, day)
     return datetime(gregorian_date[0], gregorian_date[1], gregorian_date[2])
 
-
-sorted_dates_gregorian = [persian_to_gregorian(date) for date in sorted_dates]
+# Convert Persian dates in your sorted dates list to Gregorian dates
+sorted_dates_persian = sorted_dates 
+sorted_dates_gregorian = [persian_to_gregorian(date) for date in sorted_dates_persian]
 
 # Row A
 #b1, b2 = st.columns(2)
 #selected_date = b1.selectbox('Select Date', sorted_dates)
 #selected_category = b2.selectbox('Select Category', categories)
 
+# Date range selection using calendar widget
 b1, b2 = st.columns(2)
 start_date, end_date = b1.date_input(
     "Select Date Range",
@@ -73,6 +76,7 @@ start_date, end_date = b1.date_input(
     min_value=sorted_dates_gregorian[0],
     max_value=sorted_dates_gregorian[-1]
 )
+
 
 # Function to convert Gregorian date to Persian date
 def gregorian_to_persian(gregorian_date):
@@ -82,6 +86,9 @@ def gregorian_to_persian(gregorian_date):
 # Convert the selected Gregorian dates back to Persian format
 start_date_persian = gregorian_to_persian(start_date)
 end_date_persian = gregorian_to_persian(end_date)
+
+# Filter Persian dates
+filtered_dates_persian = [date for date in sorted_dates_persian if start_date_persian <= date <= end_date_persian]
 
 # Filter Persian dates
 filtered_dates_persian = [date for date in sorted_dates if start_date_persian <= date <= end_date_persian]
