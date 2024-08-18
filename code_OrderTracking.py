@@ -75,13 +75,15 @@ past_7_days = past_8_days[1:]
 
 # Get the 7 days before the last 7 days
 if len(past_7_days) >= 7:
-    past_14_days = get_past_dates(past_8_days[0], days=7)
+    2ndpast_7_days = get_past_dates(past_8_days[0], days=7)
 else:
-    past_14_days = []
+    2ndpast_7_days = []
+
+past_14_days = 2ndpast_7_days + past_7_days
 
 # Filter DataFrames
 df_current_week = filtered_df[filtered_df['Date_Formatted'].isin(past_7_days)]
-df_previous_week = filtered_df[filtered_df['Date_Formatted'].isin(past_14_days)]
+df_previous_week = filtered_df[filtered_df['Date_Formatted'].isin(2ndpast_7_days)]
 
 # Calculate metrics for current week
 current_total_sales = df_current_week['TotalPrice'].sum()
@@ -112,8 +114,8 @@ if past_7_days:
 else:
     st.write("Calculated Weekdays: Not enough data to display")
 
-if past_14_days:
-    st.write(f"Previous Weekdays: From {past_14_days[0]} to {past_14_days[-1]}")
+if 2ndpast_7_days:
+    st.write(f"Previous Weekdays: From {2ndpast_7_days[0]} to {2ndpast_7_days[-1]}")
 else:
     st.write("Previous Weekdays: Not enough data to display")
 
