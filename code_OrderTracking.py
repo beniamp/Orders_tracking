@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
 from PIL import Image
 from convertdate import persian
@@ -45,28 +46,30 @@ sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 def persian_to_gregorian(persian_date_str):
     year, month, day = map(int, persian_date_str.split('-'))
     gregorian_date = persian.to_gregorian(year, month, day)
-    return f'{gregorian_date[0]:04}-{gregorian_date[1]:02}-{gregorian_date[2]:02}'
+    return datetime(gregorian_date[0], gregorian_date[1], gregorian_date[2])
 
-# Convert Persian dates to Gregorian (keeping as string)
+# Convert Persian dates to Gregorian
 sorted_dates_persian = sorted_dates 
 sorted_dates_gregorian = [persian_to_gregorian(date) for date in sorted_dates_persian]
-
-# Convert Gregorian strings to datetime objects (only for date selection)
-sorted_dates_gregorian_dt = [datetime.strptime(date, '%Y-%m-%d') for date in sorted_dates_gregorian]
 
 # Date range selection using calendar widget
 b1, b2 = st.columns(2)
 start_date, end_date = b1.date_input(
     "Select Date Range",
-    value=[sorted_dates_gregorian_dt[0], sorted_dates_gregorian_dt[-1]],
-    min_value=sorted_dates_gregorian_dt[0],
-    max_value=sorted_dates_gregorian_dt[-1]
+    value=[sorted_dates_gregorian[0], sorted_dates_gregorian[-1]],
+    min_value=sorted_dates_gregorian[0],
+    max_value=sorted_dates_gregorian[-1]
 )
 selected_category = b2.selectbox('Select Category', categories)
 
-# Convert selected Gregorian dates back to Persian format
-start_date_persian = sorted_dates_persian[sorted_dates_gregorian_dt.index(start_date)]
-end_date_persian = sorted_dates_persian[sorted_dates_gregorian_dt.index(end_date)]
+# Convert Gregorian dates back to Persian format
+def gregorian_to_persian(gregorian_date):
+    persian_date = persian.from_gregorian(gregorian_date.year, gregorian_date.month, gregorian_date.day)
+    return f'{persian_date[0]:04}-{persian_date[1]:02}-{persian_date[2]:02}'
+
+# Convert the selected Gregorian dates back to Persian format
+start_date_persian = gregorian_to_persian(start_date)
+end_date_persian = gregorian_to_persian(end_date)
 
 # Calculate the number of days in the selected range
 num_days = (end_date - start_date).days + 1
@@ -75,9 +78,8 @@ num_days = (end_date - start_date).days + 1
 previous_start_date = start_date - timedelta(days=num_days)
 previous_end_date = end_date - timedelta(days=num_days)
 
-# Convert previous Gregorian dates back to Persian format
-previous_start_date_persian = sorted_dates_persian[sorted_dates_gregorian_dt.index(previous_start_date)]
-previous_end_date_persian = sorted_dates_persian[sorted_dates_gregorian_dt.index(previous_end_date)]
+previous_start_date_persian = gregorian_to_persian(previous_start_date)
+previous_end_date_persian = gregorian_to_persian(previous_end_date)
 
 # Filter DataFrame by date and category
 filtered_dates_persian = [date for date in sorted_dates if start_date_persian <= date <= end_date_persian]
@@ -113,8 +115,8 @@ formatted_total_volume = "{:,}".format(current_total_volume)
 formatted_total_net = "{:,}".format(current_total_net)
 
 st.write(f'Domain of period time: {num_days}')
-st.write(f'Current period range: {start_date_persian} to {end_date_persian}')
-st.write(f'Previous period range: {previous_start_date_persian} to {previous_end_date_persian}')
+st.write(f'Current period range:{start_date_persian} to {end_date_persian}')
+st.write(f'Previous period range:{previous_start_date_persian} to {previous_end_date_persian}')
 
 # Display metrics
 a2, a3, a4 = st.columns(3)
@@ -140,42 +142,4 @@ def format_persian_date(date_str):
 
 filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
-def create_bar_chart_with_trend(current_df, previous_df, num_days):
-    # Combine current and previous DataFrames
-    combined_df = pd.concat([current_df, previous_df])
-    
-    # Group data by date and sum the quantities
-    daily_sales = combined_df.groupby('Date_Formatted').sum()['Quantity'].reset_index()
-    
-    # Sort by date
-    daily_sales = daily_sales.sort_values(by='Date_Formatted')
-    
-    # Format Persian dates
-    daily_sales['FormattedDate_p'] = daily_sales['Date_Formatted'].apply(format_persian_date)
-    
-    # Create the bar chart
-    fig = go.Figure()
-    
-    # Add bars for the current date range
-    fig.add_trace(go.Bar(
-        x=daily_sales['FormattedDate_p'][:num_days], 
-        y=daily_sales['Quantity'][:num_days],
-        name='Current Period',
-        marker_color='blue'
-    ))
-    
-    # Add bars for the previous date range
-    fig.add_trace(go.Bar(
-        x=daily_sales['FormattedDate_p'][num_days:], 
-        y=daily_sales['Quantity'][num_days:],
-        name='Previous Period',
-        marker_color='lightblue'
-    ))
-    
-    # Add a line trend connecting averages of each period
-    current_avg = daily_sales['Quantity'][:num_days].mean()
-    previous_avg = daily_sales['Quantity'][num_days:].mean()
-    
-   
-fig = create_bar_chart_with_trend(current_filtered_df, previous_filtered_df, num_days)
-st.plotly_chart(fig)
+
