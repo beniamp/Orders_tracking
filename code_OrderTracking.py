@@ -181,7 +181,7 @@ def sales_over_time(df, past_14_days):
         y0=average_quantity,
         x1=full_sales['FormattedDate_p'].max(),
         y1=average_quantity,
-        line=dict(color='blue', dash='dash'),
+        line=dict(color='yellow', dash='dash'),
         xref='x',
         yref='y'
     )
