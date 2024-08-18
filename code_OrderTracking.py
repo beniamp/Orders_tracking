@@ -99,8 +99,17 @@ formatted_total_net = "{:,}".format(current_total_net)
 
 
 # Row B: Metrics display
-st.write(f"Calculated Weekdays: From {past_7_days[0]} to {past_7_days[-1]}")
-st.write(f"Previous Weekdays: From {past_14_days[0]} to {past_14_days[-1]}")
+# Check if past_7_days and past_14_days have sufficient elements before accessing
+if past_7_days:
+    st.write(f"Calculated Weekdays: From {past_7_days[0]} to {past_7_days[-1]}")
+else:
+    st.write("Calculated Weekdays: Not enough data to display")
+
+if past_14_days:
+    st.write(f"Previous Weekdays: From {past_14_days[0]} to {past_14_days[-1]}")
+else:
+    st.write("Previous Weekdays: Not enough data to display")
+
 a2, a3, a4 = st.columns(3)
 a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
