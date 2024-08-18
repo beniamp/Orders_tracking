@@ -84,7 +84,7 @@ start_date_persian = gregorian_to_persian(start_date)
 end_date_persian = gregorian_to_persian(end_date)
 
 # Filter Persian dates
-filtered_dates_persian = [date for date in sorted_dates_persian if start_date_persian <= date <= end_date_persian]
+filtered_dates_persian = [date for date in sorted_dates if start_date_persian <= date <= end_date_persian]
 filtered_df = df_orders[df_orders['Date_Formatted'].isin(filtered_dates_persian)]
 
 
