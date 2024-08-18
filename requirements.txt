@@ -6,3 +6,4 @@ matplotlib
 Image
 datetime
 convertdate
+timedelta
