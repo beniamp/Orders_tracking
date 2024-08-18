@@ -147,7 +147,7 @@ filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_pers
 
 # Trend Chart Sales Over Time Past 5 months
 def sales_over_time(df):
-    daily_sales = filtered_df.groupby(['Date_Formatted', FormattedDate_p]).sum()['TotalPrice'].reset_index()
+    daily_sales = filtered_df.groupby(['Date_Formatted', 'FormattedDate_p']).sum()['TotalPrice'].reset_index()
     daily_sales = daily_sales.sort_values(by='Date_Formatted')
     fig = px.line(daily_sales, x='FormattedDate_p', y='TotalPrice', title='Sales Over Time')
     fig.update_traces(line=dict(color='blue'))
