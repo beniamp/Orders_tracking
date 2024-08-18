@@ -170,7 +170,7 @@ def sales_over_time(df, past_14_days):
     full_sales = full_sales.sort_values(by='Date_Formatted')
     
     # Create a line plot
-    fig = px.line(full_sales, x='FormattedDate_p', y='Quantity', title='Sales Over Time')
+    fig = px.line(full_sales, x='FormattedDate_p', y='Quantity', title='Sales Over Time', color_discrete_sequence=['red'])
     
     # Customize the x-axis to show only the filtered dates
     fig.update_xaxes(type='category', title_text='Date')
