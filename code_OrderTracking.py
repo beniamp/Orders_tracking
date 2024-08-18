@@ -114,7 +114,7 @@ if past_7_days:
 else:
     st.write("Calculated Weekdays: Not enough data to display")
 
-if 2ndpast_7_days:
+if second_past_7_days:
     st.write(f"Previous Weekdays: From {second_past_7_days[0]} to {second_past_7_days[-1]}")
 else:
     st.write("Previous Weekdays: Not enough data to display")
