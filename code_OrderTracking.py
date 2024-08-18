@@ -43,6 +43,7 @@ color_val = df_orders['ColorName'].unique()
 
 
 
+
 # Formatting date values
 df_orders['Date_Formatted'] = df_orders['Date_Formatted'].fillna('0000-00-00')
 df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
@@ -50,6 +51,15 @@ df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 # Convert dates to integer format
 df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
 sorted_dates = sorted(df_orders['Date_Formatted'].unique())
+
+# Function to convert Persian date to Gregorian date
+def persian_to_gregorian(persian_date_str):
+    year, month, day = map(int, persian_date_str.split('-'))
+    gregorian_date = persian.to_gregorian(year, month, day)
+    return datetime(gregorian_date[0], gregorian_date[1], gregorian_date[2])
+
+
+sorted_dates_gregorian = [persian_to_gregorian(date) for date in sorted_dates]
 
 # Row A
 b1, b2 = st.columns(2)
