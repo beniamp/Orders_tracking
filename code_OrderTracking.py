@@ -71,47 +71,49 @@ def gregorian_to_persian(gregorian_date):
 start_date_persian = gregorian_to_persian(start_date)
 end_date_persian = gregorian_to_persian(end_date)
 
+# Calculate the number of days in the selected range
+num_days = (end_date - start_date).days + 1
+
+# Calculate the previous date range
+previous_start_date = start_date - timedelta(days=num_days)
+previous_end_date = end_date - timedelta(days=num_days)
+
+previous_start_date_persian = gregorian_to_persian(previous_start_date)
+previous_end_date_persian = gregorian_to_persian(previous_end_date)
+
 # Filter DataFrame by date and category
 filtered_dates_persian = [date for date in sorted_dates if start_date_persian <= date <= end_date_persian]
 filtered_df = df_orders[df_orders['Date_Formatted'].isin(filtered_dates_persian)]
 
+# Filter DataFrame by current and previous date ranges
+current_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start_date_persian) & (df_orders['Date_Formatted'] <= end_date_persian)]
+previous_filtered_df = df_orders[(df_orders['Date_Formatted'] >= previous_start_date_persian) & (df_orders['Date_Formatted'] <= previous_end_date_persian)]
+
+# Apply category filter if necessary
 if selected_category != 'All Categories':
-    filtered_df = filtered_df[filtered_df['Category'] == selected_category]
+    current_filtered_df = current_filtered_df[current_filtered_df['Category'] == selected_category]
+    previous_filtered_df = previous_filtered_df[previous_filtered_df['Category'] == selected_category]
 
-# Define a helper function to get the past N days
-def get_past_dates(date_str, days=7):
-    date_index = sorted_dates.index(date_str)
-    if date_index - (days - 1) >= 0:
-        return sorted_dates[date_index - (days - 1):date_index + 1]
-    return sorted_dates[:date_index + 1]
+# Calculate metrics for the current date range
+current_total_sales = current_filtered_df['TotalPrice'].sum()
+current_total_volume = current_filtered_df['Quantity'].sum()
+current_total_net = current_filtered_df['TotalNetPrice'].sum()
 
-# Get the past 7 and 14 days
-past_8_days = get_past_dates(sorted_dates[-1], days=8)
-past_7_days = past_8_days[1:]
-second_past_7_days = get_past_dates(past_8_days[0], days=7) if len(past_7_days) >= 7 else []
-
-past_14_days = second_past_7_days + past_7_days
-
-# Filter DataFrames for current and previous weeks
-df_current_week = filtered_df[filtered_df['Date_Formatted'].isin(past_7_days)]
-df_previous_week = filtered_df[filtered_df['Date_Formatted'].isin(second_past_7_days)]
-
-# Calculate metrics
-current_total_sales = df_current_week['TotalPrice'].sum()
-formatted_total_sales = "{:,}".format(current_total_sales)
-current_total_volume = df_current_week['Quantity'].sum()
-formatted_total_volume = "{:,}".format(current_total_volume)
-current_total_net = df_current_week['TotalNetPrice'].sum()
-formatted_total_net = "{:,}".format(current_total_net)
-
-previous_total_sales = df_previous_week['TotalPrice'].sum()
-previous_total_volume = df_previous_week['Quantity'].sum()
-previous_total_net = df_previous_week['TotalNetPrice'].sum()
+# Calculate metrics for the previous date range
+previous_total_sales = previous_filtered_df['TotalPrice'].sum()
+previous_total_volume = previous_filtered_df['Quantity'].sum()
+previous_total_net = previous_filtered_df['TotalNetPrice'].sum()
 
 # Calculate growth percentages
 sales_growth = ((current_total_sales - previous_total_sales) / previous_total_sales) * 100 if previous_total_sales else 0
 volume_growth = ((current_total_volume - previous_total_volume) / previous_total_volume) * 100 if previous_total_volume else 0
 net_growth = ((current_total_net - previous_total_net) / previous_total_net) * 100 if previous_total_net else 0
+
+# Formatting the metrics
+formatted_total_sales = "{:,}".format(current_total_sales)
+formatted_total_volume = "{:,}".format(current_total_volume)
+formatted_total_net = "{:,}".format(current_total_net)
+
 
 # Display metrics
 a2, a3, a4 = st.columns(3)
