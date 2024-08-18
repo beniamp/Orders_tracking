@@ -45,18 +45,21 @@ df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 # Convert dates to integer format
 df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
 sorted_dates = sorted(df_orders['Date_Formatted'].unique())
+sorted_dates= sorted_dates[13:]
 
 # Row A
 b1, b2, b3 = st.columns(3)
 selected_date = b1.selectbox('Select Date', sorted_dates)
 b2.selectbox('Select Category', category_val)
 b3.selectbox('Select Brand', color_val)
+
 # Define a helper function to get the past 7 days
 def get_past_dates(date_str, days=7):
     date_index = sorted_dates.index(date_str)
     if date_index - (days - 1) >= 0:
         return sorted_dates[date_index - (days - 1):date_index + 1]
     return sorted_dates[:date_index + 1]
+
 
 
 # Get the past 7 days including the selected date
@@ -98,7 +101,7 @@ formatted_total_net = "{:,}".format(current_total_net)
 
 # Row B: Metrics display
 st.write(f"Calculated Weekdays: From {past_7_days[0]} to {past_7_days[-1]}")
-st.write(f"Previous Calculated Weekdays: From {past_14_days[0]} to {past_14_days[-1]}")
+st.write(f"Previous Weekdays: From {past_14_days[0]} to {past_14_days[-1]}")
 a2, a3, a4 = st.columns(3)
 a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
