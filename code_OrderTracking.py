@@ -203,3 +203,6 @@ def create_bar_chart_with_trend(current_df, previous_df, num_days):
     )
     
     return fig
+    
+fig = create_bar_chart_with_trend(current_filtered_df, previous_filtered_df, num_days)
+st.plotly_chart(fig)
