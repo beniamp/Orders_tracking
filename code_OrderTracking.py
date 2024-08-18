@@ -196,5 +196,5 @@ def sales_over_time(df, past_14_days):
     return fig
 
 # Generate the figure
-fig_sales = sales_over_time(filtered_df, past_14_days)
+fig_sales = sales_over_time(filtered_df, current_filtered_df)
 st.plotly_chart(fig_sales)
