@@ -100,9 +100,9 @@ df_previous_week = filtered_df[filtered_df['Date_Formatted'].isin(second_past_7_
 current_total_sales = df_current_week['TotalPrice'].sum()
 formatted_total_sales = "{:,}".format(current_total_sales)
 current_total_volume = df_current_week['Quantity'].sum()
-formatted_total_sales = "{:,}".format(current_total_volume)
+formatted_total_volume = "{:,}".format(current_total_volume)
 current_total_net = df_current_week['TotalNetPrice'].sum()
-formatted_total_sales = "{:,}".format(current_total_net)
+formatted_total_net = "{:,}".format(current_total_net)
 
 previous_total_sales = df_previous_week['TotalPrice'].sum()
 previous_total_volume = df_previous_week['Quantity'].sum()
@@ -115,9 +115,9 @@ net_growth = ((current_total_net - previous_total_net) / previous_total_net) * 1
 
 # Display metrics
 a2, a3, a4 = st.columns(3)
-a2.metric("Overall Price", current_total_sales, f"{sales_growth:.2f}%")
-a3.metric("Overall Volume", current_total_volume, f"{volume_growth:.2f}%")
-a4.metric("Overall Net Price", current_total_net, f"{net_growth:.2f}%")
+a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
+a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
+a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
 # Customizing Persian month to corresponding month name by dictionary
 persian_months = {'01': 'Far', '02': 'Ord', '03': 'Kho',
