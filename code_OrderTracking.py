@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from PIL import Image
 from convertdate import persian
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Page setting
 st.set_page_config(layout="wide")
