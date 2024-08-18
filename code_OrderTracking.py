@@ -142,4 +142,64 @@ def format_persian_date(date_str):
 
 filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
-
+def create_bar_chart_with_trend(current_df, previous_df, num_days):
+    # Combine current and previous DataFrames
+    combined_df = pd.concat([current_df, previous_df])
+    
+    # Group data by date and sum the quantities
+    daily_sales = combined_df.groupby('Date_Formatted').sum()['Quantity'].reset_index()
+    
+    # Sort by date
+    daily_sales = daily_sales.sort_values(by='Date_Formatted')
+    
+    # Convert dates to Persian
+    daily_sales['FormattedDate_p'] = daily_sales['Date_Formatted'].apply(gregorian_to_persian)
+    
+    # Create the bar chart
+    fig = go.Figure()
+    
+    # Add bars for the current date range
+    fig.add_trace(go.Bar(
+        x=daily_sales['FormattedDate_p'][:num_days], 
+        y=daily_sales['Quantity'][:num_days],
+        name='Current Period',
+        marker_color='blue'
+    ))
+    
+    # Add bars for the previous date range
+    fig.add_trace(go.Bar(
+        x=daily_sales['FormattedDate_p'][num_days:], 
+        y=daily_sales['Quantity'][num_days:],
+        name='Previous Period',
+        marker_color='lightblue'
+    ))
+    
+    # Add a line trend connecting averages of each period
+    current_avg = daily_sales['Quantity'][:num_days].mean()
+    previous_avg = daily_sales['Quantity'][num_days:].mean()
+    
+    fig.add_trace(go.Scatter(
+        x=[daily_sales['FormattedDate_p'][0], daily_sales['FormattedDate_p'][num_days-1]],
+        y=[current_avg, current_avg],
+        mode='lines+markers',
+        name='Current Avg Trend',
+        line=dict(color='red', dash='dash')
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=[daily_sales['FormattedDate_p'][num_days], daily_sales['FormattedDate_p'].iloc[-1]],
+        y=[previous_avg, previous_avg],
+        mode='lines+markers',
+        name='Previous Avg Trend',
+        line=dict(color='green', dash='dash')
+    ))
+    
+    # Set titles and layout
+    fig.update_layout(
+        title="Sales Over Time with Trend Line",
+        xaxis_title="Date",
+        yaxis_title="Quantity",
+        barmode='group'
+    )
+    
+    return fig
