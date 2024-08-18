@@ -112,9 +112,9 @@ net_growth = ((current_total_net - previous_total_net) / previous_total_net) * 1
 
 # Display metrics
 a2, a3, a4 = st.columns(3)
-a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
-a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
-a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
+a2.metric("Overall Price", current_total_sales, f"{sales_growth:.2f}%")
+a3.metric("Overall Volume", current_total_volume, f"{volume_growth:.2f}%")
+a4.metric("Overall Net Price", current_total_net, f"{net_growth:.2f}%")
 
 # Customizing Persian month to corresponding month name by dictionary
 persian_months = {'01': 'Far', '02': 'Ord', '03': 'Kho',
