@@ -113,4 +113,69 @@ formatted_total_volume = "{:,}".format(current_total_volume)
 formatted_total_net = "{:,}".format(current_total_net)
 
 st.write(f'Domain of period time: {num_days}')
-st.write(f'C
+st.write(f'Current period range: {start_date_persian} to {end_date_persian}')
+st.write(f'Previous period range: {previous_start_date_persian} to {previous_end_date_persian}')
+
+# Display metrics
+a2, a3, a4 = st.columns(3)
+a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
+a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
+a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
+
+# Customizing Persian month to corresponding month name by dictionary
+persian_months = {'01': 'Far', '02': 'Ord', '03': 'Kho',
+                  '04': 'Tir', '05': 'Mor', '06': 'Sha',
+                  '07': 'Meh', '08': 'Aba', '09': 'Aza',
+                  '10': 'Dey', '11': 'Bah', '12': 'Esf'}
+
+def format_persian_date(date_str):
+    if not date_str:
+        return None
+    parts = date_str.split('-')
+    if len(parts) == 3:
+        year, month, day = parts
+        persian_month = persian_months.get(month, month)
+        return f'{persian_month} {day}'
+    return date_str
+
+filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
+
+def create_bar_chart_with_trend(current_df, previous_df, num_days):
+    # Combine current and previous DataFrames
+    combined_df = pd.concat([current_df, previous_df])
+    
+    # Group data by date and sum the quantities
+    daily_sales = combined_df.groupby('Date_Formatted').sum()['Quantity'].reset_index()
+    
+    # Sort by date
+    daily_sales = daily_sales.sort_values(by='Date_Formatted')
+    
+    # Format Persian dates
+    daily_sales['FormattedDate_p'] = daily_sales['Date_Formatted'].apply(format_persian_date)
+    
+    # Create the bar chart
+    fig = go.Figure()
+    
+    # Add bars for the current date range
+    fig.add_trace(go.Bar(
+        x=daily_sales['FormattedDate_p'][:num_days], 
+        y=daily_sales['Quantity'][:num_days],
+        name='Current Period',
+        marker_color='blue'
+    ))
+    
+    # Add bars for the previous date range
+    fig.add_trace(go.Bar(
+        x=daily_sales['FormattedDate_p'][num_days:], 
+        y=daily_sales['Quantity'][num_days:],
+        name='Previous Period',
+        marker_color='lightblue'
+    ))
+    
+    # Add a line trend connecting averages of each period
+    current_avg = daily_sales['Quantity'][:num_days].mean()
+    previous_avg = daily_sales['Quantity'][num_days:].mean()
+    
+   
+fig = create_bar_chart_with_trend(current_filtered_df, previous_filtered_df, num_days)
+st.plotly_chart(fig)
