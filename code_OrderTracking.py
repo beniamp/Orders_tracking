@@ -49,10 +49,9 @@ df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astyp
 sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 
 # Row A
-b1, b2, b3 = st.columns(3)
+b1, b2 = st.columns(2)
 selected_date = b1.selectbox('Select Date', sorted_dates)
 selected_category = b2.selectbox('Select Category', categories)
-b3.selectbox('Select Brand', color_val)
 
 # Filter DataFrame by selected category
 if selected_category == 'All Categories':
