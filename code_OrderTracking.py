@@ -148,7 +148,6 @@ def format_persian_date(date_str):
 filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
 
-# Trend Chart Sales Over Time Past 14 Days
 def sales_over_time(df, past_14_days):
     # Filter the data to include only the past 14 days
     df_filtered = df[df['Date_Formatted'].isin(past_14_days)]
@@ -169,8 +168,33 @@ def sales_over_time(df, past_14_days):
     # Sort by date to ensure proper plotting
     full_sales = full_sales.sort_values(by='Date_Formatted')
     
+    # Calculate the average quantity
+    average_quantity = full_sales['Quantity'].mean()
+    
     # Create a line plot
     fig = px.line(full_sales, x='FormattedDate_p', y='Quantity', title='Sales Over Time', color_discrete_sequence=['red'])
+    
+    # Add a horizontal line for the average quantity
+    fig.add_shape(
+        type='line',
+        x0=full_sales['FormattedDate_p'].min(),
+        y0=average_quantity,
+        x1=full_sales['FormattedDate_p'].max(),
+        y1=average_quantity,
+        line=dict(color='blue', dash='dash'),
+        xref='x',
+        yref='y'
+    )
+    
+    # Add a label for the average line
+    fig.add_annotation(
+        x=full_sales['FormattedDate_p'].max(),
+        y=average_quantity,
+        text=f'Average: {average_quantity:.2f}',
+        showarrow=False,
+        yshift=10,
+        font=dict(color='blue')
+    )
     
     # Customize the x-axis to show only the filtered dates
     fig.update_xaxes(type='category', title_text='Date')
