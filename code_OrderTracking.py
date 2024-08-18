@@ -38,6 +38,8 @@ date_val = df_orders['Date_Formatted'].unique()
 category_val = df_orders['Category'].unique()
 color_val = df_orders['ColorName'].unique()
 
+
+
 # Formatting date values
 df_orders['Date_Formatted'] = df_orders['Date_Formatted'].fillna('0000-00-00')
 df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
@@ -49,8 +51,12 @@ sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 # Row A
 b1, b2, b3 = st.columns(3)
 selected_date = b1.selectbox('Select Date', sorted_dates)
-b2.selectbox('Select Category', category_val)
+selected_category = b2.selectbox('Select Category', category_val)
 b3.selectbox('Select Brand', color_val)
+
+# Filter DataFrame by selected category
+if selected_category != 'All Categories':
+    filtered_df = df_orders[df_orders['Category'] == selected_category]
 
 # Define a helper function to get the past 7 days
 def get_past_dates(date_str, days=7):
@@ -73,8 +79,8 @@ else:
     past_14_days = []
 
 # Filter DataFrames
-df_current_week = df_orders[df_orders['Date_Formatted'].isin(past_7_days)]
-df_previous_week = df_orders[df_orders['Date_Formatted'].isin(past_14_days)]
+df_current_week = filtered_df[filtered_df['Date_Formatted'].isin(past_7_days)]
+df_previous_week = filtered_df[filtered_df['Date_Formatted'].isin(past_14_days)]
 
 # Calculate metrics for current week
 current_total_sales = df_current_week['TotalPrice'].sum()
