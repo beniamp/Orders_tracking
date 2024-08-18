@@ -115,8 +115,8 @@ formatted_total_volume = "{:,}".format(current_total_volume)
 formatted_total_net = "{:,}".format(current_total_net)
 
 st.write(f'Domain of period time: {num_days}')
-st.write(f'Current period range:{start_date_persian} to {end_date_persian}')
-st.write(f'Previous period range:{previous_start_date_persian} to {previous_end_date_persian}')
+st.write(f'Current period range: {start_date_persian} to {end_date_persian}')
+st.write(f'Previous period range: {previous_start_date_persian} to {previous_end_date_persian}')
 
 # Display metrics
 a2, a3, a4 = st.columns(3)
@@ -145,6 +145,9 @@ filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_pers
 def create_bar_chart_with_trend(current_df, previous_df, num_days):
     # Combine current and previous DataFrames
     combined_df = pd.concat([current_df, previous_df])
+    
+    # Ensure Date_Formatted is datetime before grouping
+    combined_df['Date_Formatted'] = pd.to_datetime(combined_df['Date_Formatted'], format='%Y-%m-%d')
     
     # Group data by date and sum the quantities
     daily_sales = combined_df.groupby('Date_Formatted').sum()['Quantity'].reset_index()
