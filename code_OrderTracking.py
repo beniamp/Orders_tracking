@@ -35,7 +35,7 @@ formatted_total_net = "{:,}".format(total_net)
 
 # Unique date values
 date_val = df_orders['Date_Formatted'].unique()
-category_val = df_orders['Category'].unique()
+categories = ['All Categories'] + df_orders['Category'].unique().tolist()
 color_val = df_orders['ColorName'].unique()
 
 
@@ -51,7 +51,7 @@ sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 # Row A
 b1, b2, b3 = st.columns(3)
 selected_date = b1.selectbox('Select Date', sorted_dates)
-selected_category = b2.selectbox('Select Category', category_val)
+selected_category = b2.selectbox('Select Category', categories)
 b3.selectbox('Select Brand', color_val)
 
 # Filter DataFrame by selected category
