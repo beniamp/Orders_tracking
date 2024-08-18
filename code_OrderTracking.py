@@ -150,7 +150,7 @@ def sales_over_time(df, past_14_days):
     daily_sales = df_filtered.groupby(['Date_Formatted', 'FormattedDate_p']).sum()['Quantity'].reset_index()
     
     # Create a DataFrame with all possible dates in the past 14 days
-    full_dates = pd.DataFrame({'Date_Formatted': past_14_days})
+    full_dates = pd.DataFrame({'Date_Formatted': current_filtered_df})
     full_dates['FormattedDate_p'] = full_dates['Date_Formatted'].apply(format_persian_date)
     
     # Merge with the actual sales data to fill missing dates with 0
