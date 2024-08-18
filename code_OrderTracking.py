@@ -76,6 +76,8 @@ start_date, end_date = b1.date_input(
     min_value=sorted_dates_gregorian[0],
     max_value=sorted_dates_gregorian[-1]
 )
+selected_category = b2.selectbox('Select Category', categories)
+
 
 
 # Function to convert Gregorian date to Persian date
