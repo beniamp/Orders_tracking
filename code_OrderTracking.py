@@ -35,6 +35,7 @@ formatted_total_net = "{:,}".format(total_net)
 
 # Unique date values
 date_val = df_orders['Date_Formatted'].unique()
+df_orders['Category'] = df_orders['Category'].replace('گوشی موبایل ', 'گوشی موبایل')
 categories = ['All Categories'] + df_orders['Category'].unique().tolist()
 color_val = df_orders['ColorName'].unique()
 
