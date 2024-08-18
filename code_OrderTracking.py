@@ -145,13 +145,25 @@ def format_persian_date(date_str):
 filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
 
-# Trend Chart Sales Over Time Past 5 months
-def sales_over_time(df):
-    daily_sales = filtered_df.groupby(['Date_Formatted', 'FormattedDate_p']).sum()['TotalPrice'].reset_index()
+# Trend Chart Sales Over Time Past 14 Days
+def sales_over_time(df, past_14_days):
+    # Filter the data to include only the past 14 days
+    df_filtered = df[df['Date_Formatted'].isin(past_14_days)]
+    
+    # Group by 'Date_Formatted', 'FormattedDate_p', and 'ColorName'
+    daily_sales = df_filtered.groupby(['Date_Formatted', 'FormattedDate_p', 'ColorName']).sum()['TotalPrice'].reset_index()
+    
+    # Sort by date to ensure proper plotting
     daily_sales = daily_sales.sort_values(by='Date_Formatted')
-    fig = px.line(daily_sales, x='FormattedDate_p', y='TotalPrice', title='Sales Over Time')
-    fig.update_traces(line=dict(color='blue'))
+    
+    # Create a line plot, with different colors for each 'ColorName'
+    fig = px.line(daily_sales, x='FormattedDate_p', y='TotalPrice', color='ColorName', title='Sales Over Time')
+    
+    # Customize the x-axis to show only the filtered dates
+    fig.update_xaxes(type='category')
+    
     return fig
 
-fig_sales = sales_over_time(filtered_df)
+# Generate the figure
+fig_sales = sales_over_time(filtered_df, past_14_days)
 st.plotly_chart(fig_sales)
