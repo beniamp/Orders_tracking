@@ -62,9 +62,31 @@ def persian_to_gregorian(persian_date_str):
 sorted_dates_gregorian = [persian_to_gregorian(date) for date in sorted_dates]
 
 # Row A
+#b1, b2 = st.columns(2)
+#selected_date = b1.selectbox('Select Date', sorted_dates)
+#selected_category = b2.selectbox('Select Category', categories)
+
 b1, b2 = st.columns(2)
-selected_date = b1.selectbox('Select Date', sorted_dates)
-selected_category = b2.selectbox('Select Category', categories)
+start_date, end_date = b1.date_input(
+    "Select Date Range",
+    value=[sorted_dates_gregorian[0], sorted_dates_gregorian[-1]],
+    min_value=sorted_dates_gregorian[0],
+    max_value=sorted_dates_gregorian[-1]
+)
+
+# Function to convert Gregorian date to Persian date
+def gregorian_to_persian(gregorian_date):
+    persian_date = persian.from_gregorian(gregorian_date.year, gregorian_date.month, gregorian_date.day)
+    return f'{persian_date[0]:04}-{persian_date[1]:02}-{persian_date[2]:02}'
+
+# Convert the selected Gregorian dates back to Persian format
+start_date_persian = gregorian_to_persian(start_date)
+end_date_persian = gregorian_to_persian(end_date)
+
+# Filter Persian dates
+filtered_dates_persian = [date for date in sorted_dates_persian if start_date_persian <= date <= end_date_persian]
+filtered_df = df_orders[df_orders['Date_Formatted'].isin(filtered_dates_persian)]
+
 
 # Filter DataFrame by selected category
 if selected_category == 'All Categories':
