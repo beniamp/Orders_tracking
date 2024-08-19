@@ -142,3 +142,57 @@ def format_persian_date(date_str):
 
 
 
+
+# Calculate number of days in the current selection
+num_days = (end_date - start_date).days + 1
+
+# Initialize lists to store results for each group
+date_ranges = []
+total_quantities = []
+
+# Current start date for looping
+current_end_date = end_date
+
+# Loop through the dates, stepping back by num_days each time
+while current_end_date >= start_date:
+    current_start_date = current_end_date - timedelta(days=num_days - 1)
+    
+    # Convert to Persian format
+    current_start_date_persian = gregorian_to_persian(current_start_date)
+    current_end_date_persian = gregorian_to_persian(current_end_date)
+    
+    # Filter DataFrame for this range
+    range_filtered_df = df_orders[(df_orders['Date_Formatted'] >= current_start_date_persian) & 
+                                  (df_orders['Date_Formatted'] <= current_end_date_persian)]
+    
+    # Get the total quantity for this date range
+    total_quantity = range_filtered_df['Quantity'].sum()
+    
+    # Store the results
+    date_ranges.append(f"{current_start_date_persian} to {current_end_date_persian}")
+    total_quantities.append(total_quantity)
+    
+    # Move to the previous date range
+    current_end_date = current_start_date - timedelta(days=1)
+
+# Reverse the lists so that they are in chronological order
+date_ranges.reverse()
+total_quantities.reverse()
+
+# Plot the bar chart
+plt.figure(figsize=(10, 6))
+barlist = plt.bar(date_ranges, total_quantities, color=plt.cm.get_cmap('tab20c')(np.linspace(0, 1, len(date_ranges))))
+
+# Distinguish the bars by different colors
+for i in range(len(barlist)):
+    barlist[i].set_color(plt.cm.tab20c(i))
+
+plt.xlabel('Date Ranges')
+plt.ylabel('Total Quantity')
+plt.title('Total Quantity per Date Range')
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+
+# Display the plot
+st.pyplot(plt)
+
