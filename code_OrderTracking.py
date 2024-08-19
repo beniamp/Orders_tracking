@@ -175,14 +175,14 @@ fig.add_trace(go.Scatter(
 # Partition between the two ranges
 partition_date_gregorian = end_date + timedelta(days=1)
 partition_date_persian = gregorian_to_persian(partition_date_gregorian)
-fig.add_vline(
+"""fig.add_vline(
     x=partition_date_persian,
     line_width=3,
     line_dash="dash",
     line_color="black",
     annotation_text="Partition",
     annotation_position="top"
-)
+)"""
 
 # Update layout for better visualization
 fig.update_layout(
