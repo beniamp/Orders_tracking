@@ -114,54 +114,88 @@ a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
 a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
-# Function to create and return the Altair plot
-def create_plot():
-    # Prepare data for Altair
-    df_orders_to_plot = df_orders.copy()
-    if selected_category != 'All Categories':
-        df_orders_to_plot = df_orders_to_plot[df_orders_to_plot['Category'] == selected_category]
 
-    # Sort the DataFrame by Gregorian date for consistency
-    df_orders_to_plot = df_orders_to_plot.sort_values(by='Gregorian_Date')
+num_full_ranges = len(sorted_dates) // num_days
 
-    # Altair plot
-    bar_chart = alt.Chart(df_orders_to_plot).mark_bar(opacity=0.6).encode(
-        x=alt.X('Gregorian_Date:T', title='Date'),
-        y=alt.Y('Quantity:Q', title='Quantity'),
-        color=alt.value('blue'),
-        tooltip=['Gregorian_Date:T', 'Quantity:Q']
-    ).properties(
-        title='Daily Quantity'
-    )
+# Initialize lists to store metrics for all previous date ranges
+all_previous_sales = []
+all_previous_volume = []
+all_previous_net = []
 
-    # Calculate sums for each range and plot trend lines
-    range_sums = []
-    for i in range(num_days, len(sorted_dates_gregorian) + 1, num_days):
-        range_sum = df_orders_to_plot[
-            (df_orders_to_plot['Gregorian_Date'] >= sorted_dates_gregorian[i-num_days]) &
-            (df_orders_to_plot['Gregorian_Date'] < sorted_dates_gregorian[i])
-        ]['Quantity'].sum()
-        range_sums.append(range_sum)
-    
-    # Create trend line data
-    trend_data = pd.DataFrame({
-        'Date': [sorted_dates_gregorian[i*num_days-1] for i in range(len(range_sums))],
-        'Sum': range_sums
-    })
+# Loop to calculate previous date ranges
+for i in range(1, num_full_ranges + 1):
+    # Calculate previous start and end dates
+    previous_start_date = start_date - timedelta(days=num_days * i)
+    previous_end_date = end_date - timedelta(days=num_days * i)
 
-    trend_line = alt.Chart(trend_data).mark_line(color='red', strokeDash=[5, 5]).encode(
-        x=alt.X('Date:T', title='Date'),
-        y=alt.Y('Sum:Q', title='Quantity'),
-        tooltip=['Date:T', 'Sum:Q']
-    ).properties(
-        title='Trend Line (Sum of Ranges)'
-    )
+    # Convert these dates to Persian format
+    previous_start_date_persian = gregorian_to_persian(previous_start_date)
+    previous_end_date_persian = gregorian_to_persian(previous_end_date)
 
-    # Combine charts
-    combined_chart = bar_chart + trend_line
-    return combined_chart
+    # Filter DataFrame for this previous date range
+    previous_filtered_df = df_orders[
+        (df_orders['Date_Formatted'] >= previous_start_date_persian) &
+        (df_orders['Date_Formatted'] <= previous_end_date_persian)
+    ]
 
-# Button to generate plot
-if st.button('Generate Plot'):
-    plot = create_plot()
-    st.altair_chart(plot, use_container_width=True)
+    # Apply category filter if necessary
+    #if selected_category != 'All Categories':
+    #    previous_filtered_df = previous_filtered_df[previous_filtered_df['Category'] == selected_category]
+
+    # Sum up the metrics for this range
+    previous_total_sales = previous_filtered_df['TotalPrice'].sum()
+    previous_total_volume = previous_filtered_df['Quantity'].sum()
+    previous_total_net = previous_filtered_df['TotalNetPrice'].sum()
+
+    # Store the metrics in the lists
+    all_previous_sales.append(previous_total_sales)
+    all_previous_volume.append(previous_total_volume)
+    all_previous_net.append(previous_total_net)
+
+
+
+
+
+# Sum the metrics across all previous ranges
+total_previous_sales = sum(all_previous_sales)
+total_previous_volume = sum(all_previous_volume)
+total_previous_net = sum(all_previous_net)
+
+# Filter DataFrame by current date range
+current_filtered_df = df_orders[
+    (df_orders['Date_Formatted'] >= start_date_persian) &
+    (df_orders['Date_Formatted'] <= end_date_persian)
+]
+
+# Apply category filter if necessary
+if selected_category != 'All Categories':
+    current_filtered_df = current_filtered_df[current_filtered_df['Category'] == selected_category]
+
+# Calculate metrics for the current date range
+current_total_sales = current_filtered_df['TotalPrice'].sum()
+current_total_volume = current_filtered_df['Quantity'].sum()
+current_total_net = current_filtered_df['TotalNetPrice'].sum()
+
+# Calculate growth percentages
+sales_growth = ((current_total_sales - total_previous_sales) / total_previous_sales) * 100 if total_previous_sales else 0
+volume_growth = ((current_total_volume - total_previous_volume) / total_previous_volume) * 100 if total_previous_volume else 0
+net_growth = ((current_total_net - total_previous_net) / total_previous_net) * 100 if total_previous_net else 0
+
+
+
+# Example DataFrame creation (make sure lists are of the same length)
+previous_ranges_df = pd.DataFrame({
+    'Previous Range': [f'Range {i}' for i in range(1, num_full_ranges + 1)],
+    'Sales': all_previous_sales,
+    'Volume': all_previous_volume,
+    'Net': all_previous_net
+})
+
+# Create a column chart
+fig, ax = plt.subplots(figsize=(10, 6))
+previous_ranges_df.set_index('Previous Range').plot(kind='bar', ax=ax)
+ax.set_title('Previous Date Ranges Metrics')
+ax.set_ylabel('Values')
+ax.set_xlabel('Previous Date Ranges')
+plt.xticks(rotation=45)  # Slight rotation to improve readability if labels are long
+st.show(fig)
