@@ -162,7 +162,7 @@ fig.add_trace(go.Bar(
     y=merged_df['Quantity'],
     name='Current Period',
     marker_color='blue',
-    text=merged_df['Quantity_current'],
+    text=merged_df['Quantity'],
     textposition='auto'
 ))
 
@@ -172,7 +172,7 @@ fig.add_trace(go.Bar(
     y=merged_df['Quantity'],
     name='Previous Period',
     marker_color='lightblue',
-    text=merged_df['Quantity_previous'],
+    text=merged_df['Quantity'],
     textposition='auto'
 ))
 # Trend line for the total quantity
