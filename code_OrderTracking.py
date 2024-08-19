@@ -114,6 +114,8 @@ a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
 a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
+
+"""
 # Function to create and return the plot
 def create_plot():
     fig = go.Figure()
@@ -171,3 +173,5 @@ def create_plot():
 if st.button('Generate Plot'):
     fig = create_plot()
     st.plotly_chart(fig)
+
+"""
