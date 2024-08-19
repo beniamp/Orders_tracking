@@ -114,75 +114,60 @@ a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
 a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
-# Customizing Persian month to corresponding month name by dictionary
-persian_months = {'01': 'Far', '02': 'Ord', '03': 'Kho',
-                  '04': 'Tir', '05': 'Mor', '06': 'Sha',
-                  '07': 'Meh', '08': 'Aba', '09': 'Aza',
-                  '10': 'Dey', '11': 'Bah', '12': 'Esf'}
+# Function to create and return the plot
+def create_plot():
+    fig = go.Figure()
 
-def format_persian_date(date_str):
-    if not date_str:
-        return None
-    parts = date_str.split('-')
-    if len(parts) == 3:
-        year, month, day = parts
-        persian_month = persian_months.get(month, month)
-        return f'{persian_month} {day}'
-    return date_str
+    # Filter DataFrame by category if necessary
+    df_orders_to_plot = df_orders.copy()
+    if selected_category != 'All Categories':
+        df_orders_to_plot = df_orders_to_plot[df_orders_to_plot['Category'] == selected_category]
 
-filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
+    # Sort the DataFrame by Gregorian date for consistency
+    df_orders_to_plot = df_orders_to_plot.sort_values(by='Gregorian_Date')
 
-# Initialize the figure
-fig = go.Figure()
+    # Plot bar chart for every date's quantity
+    fig.add_trace(go.Bar(
+        x=df_orders_to_plot['Gregorian_Date'],
+        y=df_orders_to_plot['Quantity'],
+        name='Daily Quantity',
+        marker_color='blue',
+        opacity=0.6
+    ))
 
-# Plot the quantity for each date (columns)
-# Filter DataFrame by category if necessary
-df_orders_to_plot = df_orders.copy()
-if selected_category != 'All Categories':
-    df_orders_to_plot = df_orders_to_plot[df_orders_to_plot['Category'] == selected_category]
+    # Calculate sums for each range and plot trend lines
+    range_sums = []
+    for i in range(num_days, len(sorted_dates_gregorian) + 1, num_days):
+        range_sum = df_orders_to_plot[
+            (df_orders_to_plot['Gregorian_Date'] >= sorted_dates_gregorian[i-num_days]) &
+            (df_orders_to_plot['Gregorian_Date'] < sorted_dates_gregorian[i])
+        ]['Quantity'].sum()
+        range_sums.append(range_sum)
+        
+        # Plot vertical partition line to visually separate ranges
+        fig.add_vline(x=sorted_dates_gregorian[i-1], line=dict(color='black', width=1, dash='dash'))
 
-# Sort the DataFrame by Gregorian date for consistency
-df_orders_to_plot = df_orders_to_plot.sort_values(by='Gregorian_Date')
+    # Plot the trend line on the sums of each range
+    fig.add_trace(go.Scatter(
+        x=[sorted_dates_gregorian[i*num_days-1] for i in range(len(range_sums))],
+        y=range_sums,
+        mode='lines+markers',
+        name='Trend Line (Sum of Ranges)',
+        line=dict(color='red', dash='dash')
+    ))
 
-# Plot bar chart for every date's quantity
-fig.add_trace(go.Bar(
-    x=df_orders_to_plot['Gregorian_Date'],
-    y=df_orders_to_plot['Quantity'],
-    name='Daily Quantity',
-    marker_color='blue',
-    opacity=0.6
-))
+    # Update layout
+    fig.update_layout(
+        title="Quantity and Trends Over Date Ranges",
+        xaxis_title="Date",
+        yaxis_title="Quantity",
+        barmode='group',
+        showlegend=True,
+        xaxis=dict(type='date', tickformat="%Y-%m-%d")
+    )
+    return fig
 
-# Calculate sums for each range and plot trend lines
-range_sums = []
-for i in range(num_days, len(sorted_dates_gregorian) + 1, num_days):
-    range_sum = df_orders_to_plot[
-        (df_orders_to_plot['Gregorian_Date'] >= sorted_dates_gregorian[i-num_days]) &
-        (df_orders_to_plot['Gregorian_Date'] < sorted_dates_gregorian[i])
-    ]['Quantity'].sum()
-    range_sums.append(range_sum)
-    
-    # Plot vertical partition line to visually separate ranges
-    fig.add_vline(x=sorted_dates_gregorian[i-1], line=dict(color='black', width=1, dash='dash'))
-
-# Plot the trend line on the sums of each range
-fig.add_trace(go.Scatter(
-    x=[sorted_dates_gregorian[i*num_days-1] for i in range(len(range_sums))],
-    y=range_sums,
-    mode='lines+markers',
-    name='Trend Line (Sum of Ranges)',
-    line=dict(color='red', dash='dash')
-))
-
-# Update layout
-fig.update_layout(
-    title="Quantity and Trends Over Date Ranges",
-    xaxis_title="Date",
-    yaxis_title="Quantity",
-    barmode='group',
-    showlegend=True,
-    xaxis=dict(type='date', tickformat="%Y-%m-%d")
-)
-
-# Show the chart in Streamlit
-st.plotly_chart(fig)
+# Button to generate plot
+if st.button('Generate Plot'):
+    fig = create_plot()
+    st.plotly_chart(fig)
