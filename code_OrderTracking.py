@@ -149,7 +149,7 @@ fig = go.Figure()
 
 # Bar plot for total quantity per date
 fig.add_trace(go.Bar(
-    x=filtered_df['Date_Formatted'],
+    x=filtered_df['FormattedDate_p'],
     y=filtered_df['Quantity'],
     name='Total Quantity',
     marker_color='indianred'
@@ -157,7 +157,7 @@ fig.add_trace(go.Bar(
 
 # Trend line for sum of quantities in current and previous date range
 fig.add_trace(go.Scatter(
-    x=current_filtered_df['Date_Formatted'],
+    x=current_filtered_df['FormattedDate_p'],
     y=current_filtered_df['Quantity'].cumsum(),  # Assuming cumulative sum for trend
     mode='lines+markers',
     name='Current Range Trend',
@@ -165,7 +165,7 @@ fig.add_trace(go.Scatter(
 ))
 
 fig.add_trace(go.Scatter(
-    x=previous_filtered_df['Date_Formatted'],
+    x=previous_filtered_df['FormattedDate_p'],
     y=previous_filtered_df['Quantity'].cumsum(),
     mode='lines+markers',
     name='Previous Range Trend',
