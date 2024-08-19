@@ -149,7 +149,7 @@ fig = go.Figure()
 
 # Bar plot for total quantity per date
 fig.add_trace(go.Bar(
-    x=filtered_df['FormattedDate_p'],
+    x=filtered_df['FormattedDate'],
     y=filtered_df['Quantity'],
     name='Total Quantity',
     marker_color='indianred'
