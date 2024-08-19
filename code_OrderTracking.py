@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
+import altair as alt
 from PIL import Image
 from convertdate import persian
 from datetime import datetime, timedelta
@@ -114,11 +114,9 @@ a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
 a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
-# Function to create and return the plot
+# Function to create and return the Altair plot
 def create_plot():
-    fig = go.Figure()
-
-    # Filter DataFrame by category if necessary
+    # Prepare data for Altair
     df_orders_to_plot = df_orders.copy()
     if selected_category != 'All Categories':
         df_orders_to_plot = df_orders_to_plot[df_orders_to_plot['Category'] == selected_category]
@@ -126,14 +124,15 @@ def create_plot():
     # Sort the DataFrame by Gregorian date for consistency
     df_orders_to_plot = df_orders_to_plot.sort_values(by='Gregorian_Date')
 
-    # Plot bar chart for every date's quantity
-    fig.add_trace(go.Bar(
-        x=df_orders_to_plot['Gregorian_Date'],
-        y=df_orders_to_plot['Quantity'],
-        name='Daily Quantity',
-        marker_color='blue',
-        opacity=0.6
-    ))
+    # Altair plot
+    bar_chart = alt.Chart(df_orders_to_plot).mark_bar(opacity=0.6).encode(
+        x=alt.X('Gregorian_Date:T', title='Date'),
+        y=alt.Y('Quantity:Q', title='Quantity'),
+        color=alt.value('blue'),
+        tooltip=['Gregorian_Date:T', 'Quantity:Q']
+    ).properties(
+        title='Daily Quantity'
+    )
 
     # Calculate sums for each range and plot trend lines
     range_sums = []
@@ -143,31 +142,26 @@ def create_plot():
             (df_orders_to_plot['Gregorian_Date'] < sorted_dates_gregorian[i])
         ]['Quantity'].sum()
         range_sums.append(range_sum)
-        
-        # Plot vertical partition line to visually separate ranges
-        fig.add_vline(x=sorted_dates_gregorian[i-1], line=dict(color='black', width=1, dash='dash'))
+    
+    # Create trend line data
+    trend_data = pd.DataFrame({
+        'Date': [sorted_dates_gregorian[i*num_days-1] for i in range(len(range_sums))],
+        'Sum': range_sums
+    })
 
-    # Plot the trend line on the sums of each range
-    fig.add_trace(go.Scatter(
-        x=[sorted_dates_gregorian[i*num_days-1] for i in range(len(range_sums))],
-        y=range_sums,
-        mode='lines+markers',
-        name='Trend Line (Sum of Ranges)',
-        line=dict(color='red', dash='dash')
-    ))
-
-    # Update layout
-    fig.update_layout(
-        title="Quantity and Trends Over Date Ranges",
-        xaxis_title="Date",
-        yaxis_title="Quantity",
-        barmode='group',
-        showlegend=True,
-        xaxis=dict(type='date', tickformat="%Y-%m-%d")
+    trend_line = alt.Chart(trend_data).mark_line(color='red', strokeDash=[5, 5]).encode(
+        x=alt.X('Date:T', title='Date'),
+        y=alt.Y('Sum:Q', title='Quantity'),
+        tooltip=['Date:T', 'Sum:Q']
+    ).properties(
+        title='Trend Line (Sum of Ranges)'
     )
-    return fig
+
+    # Combine charts
+    combined_chart = bar_chart + trend_line
+    return combined_chart
 
 # Button to generate plot
 if st.button('Generate Plot'):
-    fig = create_plot()
-    st.plotly_chart(fig)
+    plot = create_plot()
+    st.altair_chart(plot, use_container_width=True)
