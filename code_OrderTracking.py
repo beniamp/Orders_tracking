@@ -141,7 +141,8 @@ def format_persian_date(date_str):
     return date_str
 
 filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
-
+current_filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
+previous_filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
 
 # Creating bar plot and trend line
