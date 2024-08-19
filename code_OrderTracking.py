@@ -178,14 +178,7 @@ fig.add_trace(go.Scatter(
     text=f"Average Quantity: {current_avg_quantity:.2f}"
 ))
 
-# Add a partition line between the two ranges (optional)
-partition_date = current_start_date_persian
-fig.add_vline(
-    x=partition_date,
-    line=dict(color='green', dash='dash', width=3),
-    annotation_text='Partition Between Periods',
-    annotation_position="top left"
-)
+
 
 # Customize layout
 fig.update_layout(
