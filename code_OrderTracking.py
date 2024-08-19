@@ -157,60 +157,55 @@ merged_df['Total_Quantity'] = merged_df['Quantity_current'] + merged_df['Quantit
 merged_df['Date_Gregorian'] = merged_df['Date_Formatted'].apply(persian_to_gregorian)
 medged_df['Date_Persian'] = merged_df['Date_Formatted'].apply(gregorian_to_persian)
 
-# Create the bar plot for total quantity and trend line for sum of quantities
+import plotly.graph_objs as go
+
+# Calculate the average (or total) quantity for each range
+current_avg_quantity = current_filtered_df['Quantity'].mean()  # Use sum() if you want the total
+previous_avg_quantity = previous_filtered_df['Quantity'].mean()  # Use sum() if you want the total
+
+# Determine the start and end dates in Persian (or Gregorian) for plotting
+current_start_date_persian = start_date_persian
+current_end_date_persian = end_date_persian
+previous_start_date_persian = previous_start_date_persian
+previous_end_date_persian = previous_end_date_persian
+
+# Create a plot
 fig = go.Figure()
-
-# Bar plot for current period quantities
-fig.add_trace(go.Bar(
-    x=merged_df['Date_Persian'],
-    y=merged_df['Quantity_current'],
-    name='Current Period',
-    marker_color='blue',
-    text=merged_df['Quantity_current'],
-    textposition='auto'
-))
-
-# Bar plot for previous period quantities
-fig.add_trace(go.Bar(
-    x=merged_df['Date_Persian'],
-    y=merged_df['Quantity_previous'],
-    name='Previous Period',
-    marker_color='lightblue',
-    text=merged_df['Quantity_previous'],
-    textposition='auto'
-))
-
-
-
-
-# Straight line for the current period quantities
-fig.add_trace(go.Scatter(
-    x=[merged_df['Date_Persian'].min(), merged_df['Date_Persian'].max()],
-    y=[merged_df['Quantity_current'].sum(), merged_df['Quantity_current'].sum()],
-    mode='lines',
-    name='Current Period',
-    line=dict(color='blue', width=4),
-    fill='tonexty',
-    hoverinfo='text',
-    text=f"Total Quantity: {merged_df['Quantity_current'].sum()}"
-))
 
 # Straight line for the previous period quantities
 fig.add_trace(go.Scatter(
-    x=[merged_df['Date_Persian'].min(), merged_df['Date_Persian'].max()],
-    y=[merged_df['Quantity_previous'].sum(), merged_df['Quantity_previous'].sum()],
+    x=[previous_start_date_persian, previous_end_date_persian],
+    y=[previous_avg_quantity, previous_avg_quantity],
     mode='lines',
     name='Previous Period',
     line=dict(color='lightblue', width=4),
-    fill='tonexty',
     hoverinfo='text',
-    text=f"Total Quantity: {merged_df['Quantity_previous'].sum()}"
+    text=f"Average Quantity: {previous_avg_quantity:.2f}"
 ))
 
+# Straight line for the current period quantities
+fig.add_trace(go.Scatter(
+    x=[current_start_date_persian, current_end_date_persian],
+    y=[current_avg_quantity, current_avg_quantity],
+    mode='lines',
+    name='Current Period',
+    line=dict(color='blue', width=4),
+    hoverinfo='text',
+    text=f"Average Quantity: {current_avg_quantity:.2f}"
+))
+
+# Add a partition line between the two ranges (optional)
+partition_date = current_start_date_persian
+fig.add_vline(
+    x=partition_date,
+    line=dict(color='green', dash='dash', width=3),
+    annotation_text='Partition Between Periods',
+    annotation_position="top left"
+)
 
 # Customize layout
 fig.update_layout(
-    title='Total Quantity for Selected Date Ranges (Straight Line Representation)',
+    title='Average Quantity for Selected Date Ranges',
     xaxis_title='Date',
     yaxis_title='Quantity',
     plot_bgcolor='white',
@@ -221,6 +216,7 @@ fig.update_layout(
 
 # Display the plot
 st.plotly_chart(fig, use_container_width=True)
+
 
 
 
