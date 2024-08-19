@@ -143,22 +143,6 @@ def format_persian_date(date_str):
 
 
 
-# Group data by date for the current and previous periods
-current_grouped_df = current_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
-previous_grouped_df = previous_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
-
-# Merge the current and previous dataframes on the Date_Formatted column
-merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted', how='outer', suffixes=('_current', '_previous')).fillna(0)
-
-# Add a column that contains the sum of the quantities from both periods
-merged_df['Total_Quantity'] = merged_df['Quantity_current'] + merged_df['Quantity_previous']
-
-# Convert the 'Date_Formatted' back to Gregorian for plotting
-merged_df['Date_Gregorian'] = merged_df['Date_Formatted'].apply(persian_to_gregorian)
-medged_df['Date_Persian'] = merged_df['Date_Formatted'].apply(gregorian_to_persian)
-
-import plotly.graph_objs as go
-
 # Calculate the average (or total) quantity for each range
 current_avg_quantity = current_filtered_df['Quantity'].mean()  # Use sum() if you want the total
 previous_avg_quantity = previous_filtered_df['Quantity'].mean()  # Use sum() if you want the total
