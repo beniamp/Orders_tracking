@@ -142,6 +142,8 @@ def format_persian_date(date_str):
 
 filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
+
+
 # Creating bar plot and trend line
 fig = go.Figure()
 
@@ -171,9 +173,10 @@ fig.add_trace(go.Scatter(
 ))
 
 # Partition between the two ranges
-partition_date = gregorian_to_persian(end_date + timedelta(days=1))
+partition_date_gregorian = end_date + timedelta(days=1)
+partition_date_persian = gregorian_to_persian(partition_date_gregorian)
 fig.add_vline(
-    x=partition_date,
+    x=partition_date_persian,
     line_width=3,
     line_dash="dash",
     line_color="black",
@@ -192,4 +195,7 @@ fig.update_layout(
 
 # Display the plot
 st.plotly_chart(fig, use_container_width=True)
+
+# Your remaining code...
+
 
