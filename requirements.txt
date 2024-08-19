@@ -7,3 +7,4 @@ Image
 datetime
 convertdate
 timedelta
+altair
