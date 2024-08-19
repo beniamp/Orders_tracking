@@ -140,63 +140,76 @@ def format_persian_date(date_str):
         return f'{persian_month} {day}'
     return date_str
 
-filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
-current_filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
-previous_filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
 
-# Creating bar plot and trend line
+
+
+# Group data by date for the current and previous periods
+current_grouped_df = current_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
+previous_grouped_df = previous_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
+
+# Merge the current and previous dataframes on the Date_Formatted column
+merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted', how='outer', suffixes=('_current', '_previous')).fillna(0)
+
+# Add a column that contains the sum of the quantities from both periods
+merged_df['Total_Quantity'] = merged_df['Quantity_current'] + merged_df['Quantity_previous']
+
+# Convert the 'Date_Formatted' back to Gregorian for plotting
+merged_df['Date_Gregorian'] = merged_df['Date_Formatted'].apply(persian_to_gregorian)
+
+# Create the bar plot for total quantity and trend line for sum of quantities
 fig = go.Figure()
 
-# Bar plot for total quantity per date
+# Bar plot for current period quantities
 fig.add_trace(go.Bar(
-    x=filtered_df['FormattedDate_p'],
-    y=filtered_df['Quantity'],
-    name='Total Quantity',
-    marker_color='indianred'
+    x=merged_df['Date_Gregorian'],
+    y=merged_df['Quantity_current'],
+    name='Current Period',
+    marker_color='blue',
+    text=merged_df['Quantity_current'],
+    textposition='auto'
 ))
 
-# Trend line for sum of quantities in current and previous date range
+# Bar plot for previous period quantities
+fig.add_trace(go.Bar(
+    x=merged_df['Date_Gregorian'],
+    y=merged_df['Quantity_previous'],
+    name='Previous Period',
+    marker_color='lightblue',
+    text=merged_df['Quantity_previous'],
+    textposition='auto'
+))
+
+# Trend line for the total quantity
 fig.add_trace(go.Scatter(
-    x=current_filtered_df['FormattedDate_p'],
-    y=current_filtered_df['Quantity'].cumsum(),  # Assuming cumulative sum for trend
+    x=merged_df['Date_Gregorian'],
+    y=merged_df['Total_Quantity'],
     mode='lines+markers',
-    name='Current Range Trend',
-    line=dict(color='blue')
+    name='Total Quantity (Current + Previous)',
+    line=dict(color='red', dash='dash'),
+    marker=dict(size=6, color='red')
 ))
 
-fig.add_trace(go.Scatter(
-    x=previous_filtered_df['FormattedDate_p'],
-    y=previous_filtered_df['Quantity'].cumsum(),
-    mode='lines+markers',
-    name='Previous Range Trend',
-    line=dict(color='green')
-))
+# Add a partition line between the two ranges
+partition_date = persian_to_gregorian(end_date_persian)  # This is the end of the current period
+fig.add_vline(
+    x=partition_date,
+    line=dict(color='green', dash='dash', width=3),
+    annotation_text='Partition Between Periods',
+    annotation_position="top left"
+)
 
-# Partition between the two ranges
-partition_date_gregorian = end_date + timedelta(days=1)
-partition_date_persian = gregorian_to_persian(partition_date_gregorian)
-"""fig.add_vline(
-    x=partition_date_persian,
-    line_width=3,
-    line_dash="dash",
-    line_color="black",
-    annotation_text="Partition",
-    annotation_position="top"
-)"""
-
-# Update layout for better visualization
+# Customize layout
 fig.update_layout(
-    title="Total Quantity and Trend Line",
-    xaxis_title="Date",
-    yaxis_title="Total Quantity",
+    title='Total Quantity and Trend Line for Selected Date Ranges',
+    xaxis_title='Date',
+    yaxis_title='Quantity',
     barmode='group',
-    template="plotly_white"
+    plot_bgcolor='white',
+    xaxis=dict(showgrid=False),
+    yaxis=dict(showgrid=True, gridcolor='lightgrey'),
+    legend_title_text='Legend'
 )
 
 # Display the plot
 st.plotly_chart(fig, use_container_width=True)
-
-# Your remaining code...
-
-
