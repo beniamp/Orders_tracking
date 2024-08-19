@@ -147,46 +147,5 @@ def format_persian_date(date_str):
 
 
 
-# Assuming `df_orders` and all other variables are already defined as in your provided code
-
-# Step 1: Calculate the number of days in the selected range
-num_days = (end_date - start_date).days + 1
-
-# Step 2: Create a mapping of each date to its respective range group
-def get_date_group(date, start_date, num_days):
-    date_diff = (date - start_date).days
-    return date_diff // num_days
-
-# Convert Persian dates in df_orders to Gregorian for easier handling
-df_orders['Gregorian_Date'] = df_orders['Date_Formatted'].apply(persian_to_gregorian)
-
-# Assign group numbers based on the selected range
-df_orders['Date_Group'] = df_orders['Gregorian_Date'].apply(lambda x: get_date_group(x, start_date, num_days))
-
-# Step 3: Aggregate the data by date
-grouped_df = df_orders.groupby(['Gregorian_Date', 'Date_Group']).agg({'Quantity': 'sum'}).reset_index()
-
-# Step 4: Plot the data with distinct colors for each group
-plt.figure(figsize=(12, 8))
-
-# Get unique groups
-unique_groups = grouped_df['Date_Group'].unique()
-colors = plt.cm.get_cmap('tab20', len(unique_groups))
-
-# Plotting each group with a distinct color
-for group in unique_groups:
-    group_df = grouped_df[grouped_df['Date_Group'] == group]
-    plt.bar(group_df['Gregorian_Date'], group_df['Quantity'], color=colors(group), label=f'Group {group + 1}')
-
-# Formatting the plot
-plt.xlabel('Date')
-plt.ylabel('Total Quantity')
-plt.title('Total Quantity per Date with Grouped Ranges')
-plt.legend(title='Date Ranges')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-
-# Display the plot
-st.pyplot(plt)
 
 
