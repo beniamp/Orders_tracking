@@ -142,47 +142,46 @@ def format_persian_date(date_str):
 
 
 
+# Group data by date for the current and previous periods
+current_grouped_df = current_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
+previous_grouped_df = previous_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
 
-# Calculate the average (or total) quantity for each range
-current_avg_quantity = current_filtered_df['Quantity'].mean()  # Use sum() if you want the total
-previous_avg_quantity = previous_filtered_df['Quantity'].mean()  # Use sum() if you want the total
+# Merge the current and previous dataframes on the Date_Formatted column
+merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted', how='outer', suffixes=('_current', '_previous')).fillna(0)
 
-# Determine the start and end dates in Persian (or Gregorian) for plotting
-current_start_date_persian = start_date_persian
-current_end_date_persian = end_date_persian
-previous_start_date_persian = previous_start_date_persian
-previous_end_date_persian = previous_end_date_persian
+# Convert the 'Date_Formatted' back to Gregorian for plotting
+merged_df['Date_Gregorian'] = merged_df['Date_Formatted'].apply(persian_to_gregorian)
 
-# Create a plot
+# Create a line plot where each period's data is represented as a straight line
 fig = go.Figure()
-
-# Straight line for the previous period quantities
-fig.add_trace(go.Scatter(
-    x=[previous_start_date_persian, previous_end_date_persian],
-    y=[previous_avg_quantity, previous_avg_quantity],
-    mode='lines',
-    name='Previous Period',
-    line=dict(color='lightblue', width=4),
-    hoverinfo='text',
-    text=f"Average Quantity: {previous_avg_quantity:.2f}"
-))
 
 # Straight line for the current period quantities
 fig.add_trace(go.Scatter(
-    x=[current_start_date_persian, current_end_date_persian],
-    y=[current_avg_quantity, current_avg_quantity],
+    x=[merged_df['Date_Gregorian'].min(), merged_df['Date_Gregorian'].max()],
+    y=[merged_df['Quantity_current'].sum(), merged_df['Quantity_current'].sum()],
     mode='lines',
     name='Current Period',
     line=dict(color='blue', width=4),
+    fill='tonexty',
     hoverinfo='text',
-    text=f"Average Quantity: {current_avg_quantity:.2f}"
+    text=f"Total Quantity: {merged_df['Quantity_current'].sum()}"
 ))
 
-
+# Straight line for the previous period quantities
+fig.add_trace(go.Scatter(
+    x=[merged_df['Date_Gregorian'].min(), merged_df['Date_Gregorian'].max()],
+    y=[merged_df['Quantity_previous'].sum(), merged_df['Quantity_previous'].sum()],
+    mode='lines',
+    name='Previous Period',
+    line=dict(color='lightblue', width=4),
+    fill='tonexty',
+    hoverinfo='text',
+    text=f"Total Quantity: {merged_df['Quantity_previous'].sum()}"
+))
 
 # Customize layout
 fig.update_layout(
-    title='Average Quantity for Selected Date Ranges',
+    title='Total Quantity for Selected Date Ranges (Straight Line Representation)',
     xaxis_title='Date',
     yaxis_title='Quantity',
     plot_bgcolor='white',
