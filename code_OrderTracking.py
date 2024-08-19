@@ -175,6 +175,16 @@ fig.add_trace(go.Bar(
     text=merged_df['Quantity_previous'],
     textposition='auto'
 ))
+# Trend line for the total quantity
+fig.add_trace(go.Scatter(
+    x=merged_df['Date_Gregorian'],
+    y=merged_df['Total_Quantity'],
+    mode='lines+markers',
+    name='Total Quantity (Current + Previous)',
+    line=dict(color='red', dash='dash'),
+    marker=dict(size=6, color='red')
+))
+
 
 
 # Customize layout
