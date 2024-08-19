@@ -161,7 +161,7 @@ fig = go.Figure()
 
 # Bar plot for current period quantities
 fig.add_trace(go.Bar(
-    x=merged_df['Date_Gregorian'],
+    x=merged_df['Date_Formatted'],
     y=merged_df['Quantity_current'],
     name='Current Period',
     marker_color='blue',
@@ -171,7 +171,7 @@ fig.add_trace(go.Bar(
 
 # Bar plot for previous period quantities
 fig.add_trace(go.Bar(
-    x=merged_df['Date_Gregorian'],
+    x=merged_df['Date_Formatted'],
     y=merged_df['Quantity_previous'],
     name='Previous Period',
     marker_color='lightblue',
@@ -184,7 +184,7 @@ fig.add_trace(go.Bar(
 
 # Straight line for the current period quantities
 fig.add_trace(go.Scatter(
-    x=[merged_df['Date_Gregorian'].min(), merged_df['Date_Gregorian'].max()],
+    x=[merged_df['Date_Formatted'].min(), merged_df['Date_Formatted'].max()],
     y=[merged_df['Quantity_current'].sum(), merged_df['Quantity_current'].sum()],
     mode='lines',
     name='Current Period',
@@ -196,7 +196,7 @@ fig.add_trace(go.Scatter(
 
 # Straight line for the previous period quantities
 fig.add_trace(go.Scatter(
-    x=[merged_df['Date_Gregorian'].min(), merged_df['Date_Gregorian'].max()],
+    x=[merged_df['Date_Formatted'].min(), merged_df['Date_Formatted'].max()],
     y=[merged_df['Quantity_previous'].sum(), merged_df['Quantity_previous'].sum()],
     mode='lines',
     name='Previous Period',
@@ -222,6 +222,4 @@ fig.update_layout(
 st.plotly_chart(fig, use_container_width=True)
 
 
-# Display the plot
-st.plotly_chart(fig, use_container_width=True)
 
