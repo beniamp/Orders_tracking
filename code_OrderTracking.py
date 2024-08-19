@@ -145,6 +145,47 @@ def format_persian_date(date_str):
     return date_str
 
 
+# Aggregate total quantity per day for the current date range
+daily_quantity = current_filtered_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
+
+# Create the bar chart
+fig = px.bar(daily_quantity, x='Date_Formatted', y='Quantity', title='Total Quantity per Day')
+st.plotly_chart(fig)
+
+
+# Create additional date ranges
+additional_ranges = []
+for i in range(1, 6):
+    additional_start_date = start_date - timedelta(days=num_days * i)
+    additional_end_date = end_date - timedelta(days=num_days * i)
+    additional_ranges.append((additional_start_date, additional_end_date))
+
+# Convert additional date ranges to Persian format
+additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(end)) for start, end in additional_ranges]
+
+
+
+# Generate additional date ranges
+additional_ranges = []
+for i in range(1, 6):
+    additional_start_date = start_date - timedelta(days=num_days * i)
+    additional_end_date = end_date - timedelta(days=num_days * i)
+    additional_ranges.append((additional_start_date, additional_end_date))
+
+# Convert additional date ranges to Persian format
+additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(end)) for start, end in additional_ranges]
+
+# Display the additional date ranges
+st.write("Additional Date Ranges:")
+for start, end in additional_ranges_persian:
+    st.write(f"Range: {start} to {end}")
+
+# Aggregate total quantity per day for the current date range
+daily_quantity = current_filtered_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
+
+# Create the bar chart
+fig = px.bar(daily_quantity, x='Date_Formatted', y='Quantity', title='Total Quantity per Day')
+#st.plotly_chart(fig)
 
 
 
