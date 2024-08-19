@@ -188,5 +188,5 @@ plt.tight_layout()
 
 # Display the plot
 st.pyplot(plt)
-Explanation:
+
 
