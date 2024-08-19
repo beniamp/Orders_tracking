@@ -159,7 +159,7 @@ fig = go.Figure()
 # Bar plot for current period quantities
 fig.add_trace(go.Bar(
     x=merged_df['Date_Gregorian'],
-    y=merged_df['Quantity_current'],
+    y=merged_df['Quantity'],
     name='Current Period',
     marker_color='blue',
     text=merged_df['Quantity_current'],
@@ -169,7 +169,7 @@ fig.add_trace(go.Bar(
 # Bar plot for previous period quantities
 fig.add_trace(go.Bar(
     x=merged_df['Date_Gregorian'],
-    y=merged_df['Quantity_previous'],
+    y=merged_df['Quantity'],
     name='Previous Period',
     marker_color='lightblue',
     text=merged_df['Quantity_previous'],
