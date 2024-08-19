@@ -152,38 +152,44 @@ merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted
 # Convert the 'Date_Formatted' back to Gregorian for plotting
 merged_df['Date_Gregorian'] = merged_df['Date_Formatted'].apply(persian_to_gregorian)
 
-# Create a line plot where each period's data is represented as a straight line
+# Create the bar plot for total quantity
 fig = go.Figure()
 
-# Straight line for the current period quantities
-fig.add_trace(go.Scatter(
-    x=[merged_df['Date_Gregorian'].min(), merged_df['Date_Gregorian'].max()],
-    y=[merged_df['Quantity_current'].sum(), merged_df['Quantity_current'].sum()],
-    mode='lines',
+# Bar plot for current period quantities
+fig.add_trace(go.Bar(
+    x=merged_df['Date_Gregorian'],
+    y=merged_df['Quantity_current'],
     name='Current Period',
-    line=dict(color='blue', width=4),
-    fill='tonexty',
-    hoverinfo='text',
-    text=f"Total Quantity: {merged_df['Quantity_current'].sum()}"
+    marker_color='blue',
+    text=merged_df['Quantity_current'],
+    textposition='auto'
 ))
 
-# Straight line for the previous period quantities
-fig.add_trace(go.Scatter(
-    x=[merged_df['Date_Gregorian'].min(), merged_df['Date_Gregorian'].max()],
-    y=[merged_df['Quantity_previous'].sum(), merged_df['Quantity_previous'].sum()],
-    mode='lines',
+# Bar plot for previous period quantities
+fig.add_trace(go.Bar(
+    x=merged_df['Date_Gregorian'],
+    y=merged_df['Quantity_previous'],
     name='Previous Period',
-    line=dict(color='lightblue', width=4),
-    fill='tonexty',
-    hoverinfo='text',
-    text=f"Total Quantity: {merged_df['Quantity_previous'].sum()}"
+    marker_color='lightblue',
+    text=merged_df['Quantity_previous'],
+    textposition='auto'
 ))
+
+# Add a partition line between the two ranges
+partition_date = persian_to_gregorian(end_date_persian)  # This is the end of the current period
+fig.add_vline(
+    x=partition_date,
+    line=dict(color='green', dash='dash', width=3),
+    annotation_text='Partition Between Periods',
+    annotation_position="top left"
+)
 
 # Customize layout
 fig.update_layout(
-    title='Total Quantity for Selected Date Ranges (Straight Line Representation)',
+    title='Total Quantity for Selected Date Ranges',
     xaxis_title='Date',
     yaxis_title='Quantity',
+    barmode='group',
     plot_bgcolor='white',
     xaxis=dict(showgrid=False),
     yaxis=dict(showgrid=True, gridcolor='lightgrey'),
@@ -192,6 +198,7 @@ fig.update_layout(
 
 # Display the plot
 st.plotly_chart(fig, use_container_width=True)
+
 
 
 
