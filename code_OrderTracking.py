@@ -189,14 +189,7 @@ fig.add_trace(go.Scatter(
     marker=dict(size=6, color='red')
 ))
 
-# Add a partition line between the two ranges
-partition_date = persian_to_gregorian(end_date_persian)  # This is the end of the current period
-fig.add_vline(
-    x=partition_date,
-    line=dict(color='green', dash='dash', width=3),
-    annotation_text='Partition Between Periods',
-    annotation_position="top left"
-)
+
 
 # Customize layout
 fig.update_layout(
