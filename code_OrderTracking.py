@@ -143,7 +143,6 @@ def format_persian_date(date_str):
 
 
 
-
 # Group data by date for the current and previous periods
 current_grouped_df = current_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
 previous_grouped_df = previous_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
@@ -151,13 +150,10 @@ previous_grouped_df = previous_filtered_df.groupby('Date_Formatted').agg({'Quant
 # Merge the current and previous dataframes on the Date_Formatted column
 merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted', how='outer', suffixes=('_current', '_previous')).fillna(0)
 
-# Add a column that contains the sum of the quantities from both periods
-merged_df['Total_Quantity'] = merged_df['Quantity_current'] + merged_df['Quantity_previous']
-
 # Convert the 'Date_Formatted' back to Gregorian for plotting
 merged_df['Date_Gregorian'] = merged_df['Date_Formatted'].apply(persian_to_gregorian)
 
-# Create the bar plot for total quantity and trend line for sum of quantities
+# Create the bar plot for total quantity
 fig = go.Figure()
 
 # Bar plot for current period quantities
@@ -180,16 +176,6 @@ fig.add_trace(go.Bar(
     textposition='auto'
 ))
 
-# Trend line for the total quantity
-fig.add_trace(go.Scatter(
-    x=merged_df['Date_Gregorian'],
-    y=merged_df['Total_Quantity'],
-    mode='lines+markers',
-    name='Total Quantity (Current + Previous)',
-    line=dict(color='red', dash='dash'),
-    marker=dict(size=6, color='red')
-))
-
 # Add a partition line between the two ranges
 partition_date = persian_to_gregorian(end_date_persian)  # This is the end of the current period
 fig.add_vline(
@@ -201,7 +187,7 @@ fig.add_vline(
 
 # Customize layout
 fig.update_layout(
-    title='Total Quantity and Trend Line for Selected Date Ranges',
+    title='Total Quantity for Selected Date Ranges',
     xaxis_title='Date',
     yaxis_title='Quantity',
     barmode='group',
@@ -213,3 +199,4 @@ fig.update_layout(
 
 # Display the plot
 st.plotly_chart(fig, use_container_width=True)
+Key Points:
