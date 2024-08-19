@@ -147,56 +147,46 @@ def format_persian_date(date_str):
 
 
 
-# Calculate number of days in the current selection
+# Assuming `df_orders` and all other variables are already defined as in your provided code
+
+# Step 1: Calculate the number of days in the selected range
 num_days = (end_date - start_date).days + 1
 
-# Initialize lists to store results for each group
-date_ranges = []
-total_quantities = []
+# Step 2: Create a mapping of each date to its respective range group
+def get_date_group(date, start_date, num_days):
+    date_diff = (date - start_date).days
+    return date_diff // num_days
 
-# Current start date for looping
-current_end_date = end_date
+# Convert Persian dates in df_orders to Gregorian for easier handling
+df_orders['Gregorian_Date'] = df_orders['Date_Formatted'].apply(persian_to_gregorian)
 
-# Loop through the dates, stepping back by num_days each time
-while current_end_date >= start_date:
-    current_start_date = current_end_date - timedelta(days=num_days - 1)
-    
-    # Convert to Persian format
-    current_start_date_persian = gregorian_to_persian(current_start_date)
-    current_end_date_persian = gregorian_to_persian(current_end_date)
-    
-    # Filter DataFrame for this range
-    range_filtered_df = df_orders[(df_orders['Date_Formatted'] >= current_start_date_persian) & 
-                                  (df_orders['Date_Formatted'] <= current_end_date_persian)]
-    
-    # Get the total quantity for this date range
-    total_quantity = range_filtered_df['Quantity'].sum()
-    
-    # Store the results
-    date_ranges.append(f"{current_start_date_persian} to {current_end_date_persian}")
-    total_quantities.append(total_quantity)
-    
-    # Move to the previous date range
-    current_end_date = current_start_date - timedelta(days=1)
+# Assign group numbers based on the selected range
+df_orders['Date_Group'] = df_orders['Gregorian_Date'].apply(lambda x: get_date_group(x, start_date, num_days))
 
-# Reverse the lists so that they are in chronological order
-date_ranges.reverse()
-total_quantities.reverse()
+# Step 3: Aggregate the data by date
+grouped_df = df_orders.groupby(['Gregorian_Date', 'Date_Group']).agg({'Quantity': 'sum'}).reset_index()
 
-# Plot the bar chart
-plt.figure(figsize=(10, 6))
-barlist = plt.bar(date_ranges, total_quantities, color=plt.cm.get_cmap('tab20c')(np.linspace(0, 1, len(date_ranges))))
+# Step 4: Plot the data with distinct colors for each group
+plt.figure(figsize=(12, 8))
 
-# Distinguish the bars by different colors
-for i in range(len(barlist)):
-    barlist[i].set_color(plt.cm.tab20c(i))
+# Get unique groups
+unique_groups = grouped_df['Date_Group'].unique()
+colors = plt.cm.get_cmap('tab20', len(unique_groups))
 
-plt.xlabel('Date Ranges')
+# Plotting each group with a distinct color
+for group in unique_groups:
+    group_df = grouped_df[grouped_df['Date_Group'] == group]
+    plt.bar(group_df['Gregorian_Date'], group_df['Quantity'], color=colors(group), label=f'Group {group + 1}')
+
+# Formatting the plot
+plt.xlabel('Date')
 plt.ylabel('Total Quantity')
-plt.title('Total Quantity per Date Range')
+plt.title('Total Quantity per Date with Grouped Ranges')
+plt.legend(title='Date Ranges')
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
 
 # Display the plot
 st.pyplot(plt)
+Explanation:
 
