@@ -179,29 +179,56 @@ fig.add_trace(go.Bar(
     textposition='auto'
 ))
 
-# Trend line for the total quantity
+
+
+
+# Straight line for the current period quantities
 fig.add_trace(go.Scatter(
-    x=merged_df['Date_Gregorian'],
-    y=merged_df['Total_Quantity'],
-    mode='lines+markers',
-    name='Total Quantity (Current + Previous)',
-    line=dict(color='red', dash='dash'),
-    marker=dict(size=6, color='red')
+    x=[merged_df['Date_Gregorian'].min(), merged_df['Date_Gregorian'].max()],
+    y=[merged_df['Quantity_current'].sum(), merged_df['Quantity_current'].sum()],
+    mode='lines',
+    name='Current Period',
+    line=dict(color='blue', width=4),
+    fill='tonexty',
+    hoverinfo='text',
+    text=f"Total Quantity: {merged_df['Quantity_current'].sum()}"
 ))
 
+# Straight line for the previous period quantities
+fig.add_trace(go.Scatter(
+    x=[merged_df['Date_Gregorian'].min(), merged_df['Date_Gregorian'].max()],
+    y=[merged_df['Quantity_previous'].sum(), merged_df['Quantity_previous'].sum()],
+    mode='lines',
+    name='Previous Period',
+    line=dict(color='lightblue', width=4),
+    fill='tonexty',
+    hoverinfo='text',
+    text=f"Total Quantity: {merged_df['Quantity_previous'].sum()}"
+))
 
+# Add a partition line between the two ranges
+partition_date = persian_to_gregorian(end_date_persian)  # This is the end of the current period
+fig.add_vline(
+    x=partition_date,
+    line=dict(color='green', dash='dash', width=3),
+    annotation_text='Partition Between Periods',
+    annotation_position="top left"
+)
 
 # Customize layout
 fig.update_layout(
-    title='Total Quantity and Trend Line for Selected Date Ranges',
+    title='Total Quantity for Selected Date Ranges (Straight Line Representation)',
     xaxis_title='Date',
     yaxis_title='Quantity',
-    barmode='group',
     plot_bgcolor='white',
     xaxis=dict(showgrid=False),
     yaxis=dict(showgrid=True, gridcolor='lightgrey'),
     legend_title_text='Legend'
 )
+
+# Display the plot
+st.plotly_chart(fig, use_container_width=True)
+
 
 # Display the plot
 st.plotly_chart(fig, use_container_width=True)
