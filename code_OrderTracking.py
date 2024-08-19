@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
+import plotly.express as px
+import plotly.graph_objects as go
 from PIL import Image
 from convertdate import persian
 from datetime import datetime, timedelta
@@ -19,6 +20,16 @@ st.image(image, width=100)  # Adjust width as needed
 # Load dataset
 df_orders = pd.read_csv('Orders.csv')
 
+# Calculate metrics
+total_sales = df_orders['TotalPrice'].sum()
+formatted_total_sales = "{:,}".format(total_sales)
+
+total_volume = df_orders['Quantity'].sum()
+formatted_total_volume = "{:,}".format(total_volume)
+
+total_net = df_orders['TotalNetPrice'].sum()
+formatted_total_net = "{:,}".format(total_net)
+
 # Clean up category data
 df_orders['Category'] = df_orders['Category'].replace('گوشی موبایل ', 'گوشی موبایل')
 categories = ['All Categories'] + df_orders['Category'].unique().tolist()
@@ -27,6 +38,10 @@ categories = ['All Categories'] + df_orders['Category'].unique().tolist()
 df_orders['Date_Formatted'] = df_orders['Date_Formatted'].fillna('0000-00-00')
 df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 
+# Ensure date is a string format
+df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
+sorted_dates = sorted(df_orders['Date_Formatted'].unique())
+
 # Function to convert Persian date to Gregorian date
 def persian_to_gregorian(persian_date_str):
     year, month, day = map(int, persian_date_str.split('-'))
@@ -34,11 +49,11 @@ def persian_to_gregorian(persian_date_str):
     return datetime(gregorian_date[0], gregorian_date[1], gregorian_date[2])
 
 # Convert Persian dates to Gregorian
-df_orders['Gregorian_Date'] = df_orders['Date_Formatted'].apply(persian_to_gregorian)
+sorted_dates_persian = sorted_dates 
+sorted_dates_gregorian = [persian_to_gregorian(date) for date in sorted_dates_persian]
 
 # Date range selection using calendar widget
 b1, b2 = st.columns(2)
-sorted_dates_gregorian = sorted(df_orders['Gregorian_Date'].unique())
 start_date, end_date = b1.date_input(
     "Select Date Range",
     value=[sorted_dates_gregorian[0], sorted_dates_gregorian[-1]],
@@ -67,27 +82,22 @@ previous_start_date_persian = gregorian_to_persian(previous_start_date)
 previous_end_date_persian = gregorian_to_persian(previous_end_date)
 
 # Filter DataFrame by date and category
-filtered_df = df_orders[
-    (df_orders['Gregorian_Date'] >= start_date) &
-    (df_orders['Gregorian_Date'] <= end_date)
-]
+filtered_dates_persian = [date for date in sorted_dates if start_date_persian <= date <= end_date_persian]
+filtered_df = df_orders[df_orders['Date_Formatted'].isin(filtered_dates_persian)]
 
-# Filter DataFrame by category if necessary
+# Filter DataFrame by current and previous date ranges
+current_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start_date_persian) & (df_orders['Date_Formatted'] <= end_date_persian)]
+previous_filtered_df = df_orders[(df_orders['Date_Formatted'] >= previous_start_date_persian) & (df_orders['Date_Formatted'] <= previous_end_date_persian)]
+
+# Apply category filter if necessary
 if selected_category != 'All Categories':
-    filtered_df = filtered_df[filtered_df['Category'] == selected_category]
+    current_filtered_df = current_filtered_df[current_filtered_df['Category'] == selected_category]
+    previous_filtered_df = previous_filtered_df[previous_filtered_df['Category'] == selected_category]
 
 # Calculate metrics for the current date range
-current_total_sales = filtered_df['TotalPrice'].sum()
-current_total_volume = filtered_df['Quantity'].sum()
-current_total_net = filtered_df['TotalNetPrice'].sum()
-
-# Filter DataFrame for previous date range
-previous_filtered_df = df_orders[
-    (df_orders['Gregorian_Date'] >= previous_start_date) &
-    (df_orders['Gregorian_Date'] <= previous_end_date)
-]
-if selected_category != 'All Categories':
-    previous_filtered_df = previous_filtered_df[previous_filtered_df['Category'] == selected_category]
+current_total_sales = current_filtered_df['TotalPrice'].sum()
+current_total_volume = current_filtered_df['Quantity'].sum()
+current_total_net = current_filtered_df['TotalNetPrice'].sum()
 
 # Calculate metrics for the previous date range
 previous_total_sales = previous_filtered_df['TotalPrice'].sum()
@@ -105,8 +115,8 @@ formatted_total_volume = "{:,}".format(current_total_volume)
 formatted_total_net = "{:,}".format(current_total_net)
 
 st.write(f'Domain of period time: {num_days}')
-st.write(f'Current period range: {start_date_persian} to {end_date_persian}')
-st.write(f'Previous period range: {previous_start_date_persian} to {previous_end_date_persian}')
+st.write(f'Current period range:{start_date_persian} to {end_date_persian}')
+st.write(f'Previous period range:{previous_start_date_persian} to {previous_end_date_persian}')
 
 # Display metrics
 a2, a3, a4 = st.columns(3)
@@ -114,15 +124,22 @@ a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
 a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
+# Customizing Persian month to corresponding month name by dictionary
+persian_months = {'01': 'Far', '02': 'Ord', '03': 'Kho',
+                  '04': 'Tir', '05': 'Mor', '06': 'Sha',
+                  '07': 'Meh', '08': 'Aba', '09': 'Aza',
+                  '10': 'Dey', '11': 'Bah', '12': 'Esf'}
+
+def format_persian_date(date_str):
+    if not date_str:
+        return None
+    parts = date_str.split('-')
+    if len(parts) == 3:
+        year, month, day = parts
+        persian_month = persian_months.get(month, month)
+        return f'{persian_month} {day}'
+    return date_str
+
+filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
 
-""""
-# Create a column chart
-fig, ax = plt.subplots(figsize=(10, 6))
-previous_ranges_df.set_index('Previous Range').plot(kind='bar', ax=ax)
-ax.set_title('Previous Date Ranges Metrics')
-ax.set_ylabel('Values')
-ax.set_xlabel('Previous Date Ranges')
-plt.xticks(rotation=45)  # Slight rotation to improve readability if labels are long
-st.show(fig)
-"""
