@@ -142,4 +142,54 @@ def format_persian_date(date_str):
 
 filtered_df['FormattedDate_p'] = filtered_df['Date_Formatted'].apply(format_persian_date)
 
+# Creating bar plot and trend line
+fig = go.Figure()
+
+# Bar plot for total quantity per date
+fig.add_trace(go.Bar(
+    x=filtered_df['FormattedDate_p'],
+    y=filtered_df['Quantity'],
+    name='Total Quantity',
+    marker_color='indianred'
+))
+
+# Trend line for sum of quantities in current and previous date range
+fig.add_trace(go.Scatter(
+    x=current_filtered_df['Date_Formatted'],
+    y=current_filtered_df['Quantity'].cumsum(),  # Assuming cumulative sum for trend
+    mode='lines+markers',
+    name='Current Range Trend',
+    line=dict(color='blue')
+))
+
+fig.add_trace(go.Scatter(
+    x=previous_filtered_df['Date_Formatted'],
+    y=previous_filtered_df['Quantity'].cumsum(),
+    mode='lines+markers',
+    name='Previous Range Trend',
+    line=dict(color='green')
+))
+
+# Partition between the two ranges
+partition_date = gregorian_to_persian(end_date + timedelta(days=1))
+fig.add_vline(
+    x=partition_date,
+    line_width=3,
+    line_dash="dash",
+    line_color="black",
+    annotation_text="Partition",
+    annotation_position="top"
+)
+
+# Update layout for better visualization
+fig.update_layout(
+    title="Total Quantity and Trend Line",
+    xaxis_title="Date",
+    yaxis_title="Total Quantity",
+    barmode='group',
+    template="plotly_white"
+)
+
+# Display the plot
+st.plotly_chart(fig, use_container_width=True)
 
