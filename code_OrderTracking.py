@@ -6,6 +6,8 @@ from PIL import Image
 from convertdate import persian
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 
 # Page setting
