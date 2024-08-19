@@ -148,48 +148,59 @@ current_grouped_df = current_filtered_df.groupby('Date_Formatted').agg({'Quantit
 previous_grouped_df = previous_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
 
 # Merge the current and previous dataframes on the Date_Formatted column
-merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted', how='outer').fillna(0)
+merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted', how='outer', suffixes=('_current', '_previous')).fillna(0)
+
+# Add a column that contains the sum of the quantities from both periods
+merged_df['Total_Quantity'] = merged_df['Quantity_current'] + merged_df['Quantity_previous']
 
 # Convert the 'Date_Formatted' back to Gregorian for plotting
 merged_df['Date_Gregorian'] = merged_df['Date_Formatted'].apply(persian_to_gregorian)
 
-# Create the bar plot for total quantity
+# Create the bar plot for total quantity and trend line for sum of quantities
 fig = go.Figure()
 
 # Bar plot for current period quantities
 fig.add_trace(go.Bar(
     x=merged_df['Date_Gregorian'],
-    y=merged_df['Quantity'],
+    y=merged_df['Quantity_current'],
     name='Current Period',
     marker_color='blue',
-    text=merged_df['Quantity'],
+    text=merged_df['Quantity_current'],
     textposition='auto'
 ))
 
 # Bar plot for previous period quantities
 fig.add_trace(go.Bar(
     x=merged_df['Date_Gregorian'],
-    y=merged_df['Quantity'],
+    y=merged_df['Quantity_previous'],
     name='Previous Period',
     marker_color='lightblue',
-    text=merged_df['Quantity'],
+    text=merged_df['Quantity_previous'],
     textposition='auto'
 ))
+
 # Trend line for the total quantity
 fig.add_trace(go.Scatter(
     x=merged_df['Date_Gregorian'],
-    y=merged_df['Quantity'],
+    y=merged_df['Total_Quantity'],
     mode='lines+markers',
-    name='Quantity (Current + Previous)',
+    name='Total Quantity (Current + Previous)',
     line=dict(color='red', dash='dash'),
     marker=dict(size=6, color='red')
 ))
 
-
+# Add a partition line between the two ranges
+partition_date = persian_to_gregorian(end_date_persian)  # This is the end of the current period
+fig.add_vline(
+    x=partition_date,
+    line=dict(color='green', dash='dash', width=3),
+    annotation_text='Partition Between Periods',
+    annotation_position="top left"
+)
 
 # Customize layout
 fig.update_layout(
-    title='Total Quantity for Selected Date Ranges',
+    title='Total Quantity and Trend Line for Selected Date Ranges',
     xaxis_title='Date',
     yaxis_title='Quantity',
     barmode='group',
