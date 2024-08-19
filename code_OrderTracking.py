@@ -148,7 +148,7 @@ current_grouped_df = current_filtered_df.groupby('Date_Formatted').agg({'Quantit
 previous_grouped_df = previous_filtered_df.groupby('Date_Formatted').agg({'Quantity': 'sum'}).reset_index()
 
 # Merge the current and previous dataframes on the Date_Formatted column
-merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted', how='outer', suffixes=('_current', '_previous')).fillna(0)
+merged_df = pd.merge(current_grouped_df, previous_grouped_df, on='Date_Formatted', how='outer').fillna(0)
 
 # Convert the 'Date_Formatted' back to Gregorian for plotting
 merged_df['Date_Gregorian'] = merged_df['Date_Formatted'].apply(persian_to_gregorian)
@@ -178,7 +178,7 @@ fig.add_trace(go.Bar(
 # Trend line for the total quantity
 fig.add_trace(go.Scatter(
     x=merged_df['Date_Gregorian'],
-    y=merged_df[(merged_df['Quantity_current']) & (merged_df['Quantity_previous'])],
+    y=merged_df['Quantity'],
     mode='lines+markers',
     name='Quantity (Current + Previous)',
     line=dict(color='red', dash='dash'),
