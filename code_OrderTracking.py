@@ -204,8 +204,10 @@ for line_date in line_positions:
 
 # Display the combined chart with the red lines
 
+
+
 # Calculate the average quantity for each segment between red lines
-average_quantities = []
+total_quantities = []
 
 # Loop through each segment between red lines
 for i in range(len(line_positions) - 1):
@@ -216,23 +218,23 @@ for i in range(len(line_positions) - 1):
     # Filter data between the start and end lines
     segment_df = combined_df_sorted[(combined_df_sorted['Date_Formatted'] >= start_line) & 
                                     (combined_df_sorted['Date_Formatted'] < end_line)]
-    print(segment_df)
 
     if not segment_df.empty:
-        # Calculate the average quantity for this segment
-        avg_quantity = segment_df['Quantity'].sum()
-        average_quantities.append((end_line, avg_quantity))
+        # Calculate th-e average quantity for this segment
+        tot_quantity = segment_df['Quantity'].sum()
+        total_quantities.append((end_line, tot_quantity))
+        
 
 # Handle the final segment after the last red line
 if len(line_positions) > 0:
     final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions[-1]]
     if not final_segment_df.empty:
-        avg_quantity = final_segment_df['Quantity'].sum()
-        average_quantities.append((final_segment_df['Date_Formatted'].max(), avg_quantity))
+        tot_quantity = final_segment_df['Quantity'].sum()
+        total_quantities.append((final_segment_df['Date_Formatted'].max(), tot_quantity))
 
 # Add a trace for the trend line
-trend_line_dates = [date for date, _ in average_quantities]
-trend_line_values = [quantity for _, quantity in average_quantities]
+trend_line_dates = [date for date, _ in total_quantities]
+trend_line_values = [quantity for _, quantity in total_quantities]
 
 fig_combined.add_trace(
     go.Scatter(x=[format_persian_date(date) for date in trend_line_dates],
