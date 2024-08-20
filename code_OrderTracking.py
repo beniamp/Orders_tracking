@@ -213,9 +213,4 @@ st.plotly_chart(fig_combined)
 
 
 
-# Generate additional date ranges
-additional_ranges = []
-for i in range(1, 6):
-    additional_start_date = start_date - timedelta(days=num_days * i)
-    additional_end_date = end_date - timedelta(days=num_days * i)
-    additional_ranges.append((additional_start_date, additional_end_date))
+
