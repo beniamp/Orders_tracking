@@ -173,20 +173,49 @@ for i in range(1, 6):
     additional_end_date = end_date - timedelta(days=num_days * i)
     additional_ranges.append((additional_start_date, additional_end_date))
 
-# Convert additional date ranges to Persian format
-additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(end)) for start, end in additional_ranges]
+# Combine the current, previous, and additional date ranges
+all_ranges_dfs = [current_filtered_df, previous_filtered_df]
 
-# Display the additional date ranges
-st.write("Additional Date Ranges:")
-for start, end in additional_ranges_persian:
-    st.write(f"Range: {start} to {end}")
+# Adding additional date range data
+for idx, (start, end) in enumerate(additional_ranges_persian):
+    additional_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start) & (df_orders['Date_Formatted'] <= end)]
+    
+    # Apply category filter if necessary
+    if selected_category != 'All Categories':
+        additional_filtered_df = additional_filtered_df[additional_filtered_df['Category'] == selected_category]
+    
+    all_ranges_dfs.append(additional_filtered_df)
 
-# Aggregate total quantity per day for the current date range
-daily_quantity = current_filtered_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
+# Concatenate all dataframes into one
+combined_df = pd.concat(all_ranges_dfs)
 
-# Create the bar chart
-fig = px.bar(daily_quantity, x='Date_Formatted', y='Quantity', title='Total Quantity per Day')
-#st.plotly_chart(fig)
+# Sort the combined DataFrame by date
+combined_df_sorted = combined_df.sort_values(by='Date_Formatted')
 
+# Aggregate total quantity per day for all ranges combined
+daily_quantity_combined = combined_df_sorted.groupby('Date_Formatted')['Quantity'].sum().reset_index()
+
+# Convert the dates to readable Persian format for plotting
+daily_quantity_combined['Date_Formatted'] = daily_quantity_combined['Date_Formatted'].apply(format_persian_date)
+
+# Create a single bar chart with all the data
+fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined')
+
+# Add red vertical lines at the start of each date range
+line_positions = [
+    start_date_persian,
+    previous_start_date_persian,
+] + [start for start, end in additional_ranges_persian]
+
+for line_date in line_positions:
+    # Convert line_date to Gregorian format for plotting (since it's in Persian format)
+    gregorian_line_date = persian_to_gregorian(line_date)
+    formatted_line_date = gregorian_line_date.strftime('%Y-%m-%d')
+
+    # Add vertical line
+    fig_combined.add_vline(x=formatted_line_date, line=dict(color='red', width=2))
+
+# Display the combined chart with the red lines
+st.plotly_chart(fig_combined)
 
 
