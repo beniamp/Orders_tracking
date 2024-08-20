@@ -221,7 +221,7 @@ for i in range(len(line_positions) - 1):
 
     if not segment_df.empty:
         # Calculate the average quantity for this segment
-        avg_quantity = segment_df['Quantity'].sum()
+        avg_quantity = segment_df['Quantity'].mean()
         average_quantities.append((end_line, avg_quantity))
 
 
