@@ -189,6 +189,8 @@ daily_quantity_combined['Date_Formatted'] = daily_quantity_combined['Date_Format
 # Create a single bar chart with all the data
 fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined')
 
+
+
 # Add red vertical lines at the start of each date range
 line_positions = [
     start_date_persian,
@@ -196,11 +198,13 @@ line_positions = [
 ] + [start for start, end in additional_ranges_persian]
 
 for line_date in line_positions:
-    # Convert line_date to Gregorian format for plotting (since it's in Persian format)
+
     formatted_line_date = format_persian_date(line_date)
 
     # Add vertical line
-    fig_combined.add_vline(x=formatted_line_date, line=dict(color='red', width=2))
+    fig_combined.add_vline(x=formatted_line_date, line_color="red", line_width=1)
+    
+
 
 # Display the combined chart with the red lines
 
