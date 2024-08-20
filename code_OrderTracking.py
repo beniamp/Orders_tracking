@@ -165,12 +165,7 @@ additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(
 
 
 
-# Generate additional date ranges
-additional_ranges = []
-for i in range(1, 6):
-    additional_start_date = start_date - timedelta(days=num_days * i)
-    additional_end_date = end_date - timedelta(days=num_days * i)
-    additional_ranges.append((additional_start_date, additional_end_date))
+
 
 # Convert additional date ranges to Persian format
 additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(end)) for start, end in additional_ranges]
@@ -217,3 +212,10 @@ fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity',
 st.plotly_chart(fig_combined)
 
 
+
+# Generate additional date ranges
+additional_ranges = []
+for i in range(1, 6):
+    additional_start_date = start_date - timedelta(days=num_days * i)
+    additional_end_date = end_date - timedelta(days=num_days * i)
+    additional_ranges.append((additional_start_date, additional_end_date))
