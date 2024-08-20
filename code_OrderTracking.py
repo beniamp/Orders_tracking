@@ -224,12 +224,7 @@ for i in range(len(line_positions) - 1):
         avg_quantity = segment_df['Quantity'].sum()
         average_quantities.append((end_line, avg_quantity))
 
-# Add the final segment from the last red line to the end of the data
-# final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions_gregorian[-1].strftime('%Y-%m-%d')]
 
-if not final_segment_df.empty:
-    avg_quantity = final_segment_df['Quantity'].sum()
-    average_quantities.append((final_segment_df['Date_Formatted'].max(), avg_quantity))
 
 # Add a trace for the trend line
 trend_line_dates = [date for date, _ in average_quantities]
