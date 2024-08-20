@@ -197,8 +197,7 @@ line_positions = [
 
 for line_date in line_positions:
     # Convert line_date to Gregorian format for plotting (since it's in Persian format)
-    gregorian_line_date = persian_to_gregorian(line_date)
-    formatted_line_date = gregorian_line_date.strftime('%Y-%m-%d')
+    formatted_line_date = format_persian_date(line_date)
 
     # Add vertical line
     fig_combined.add_vline(x=formatted_line_date, line=dict(color='red', width=2))
