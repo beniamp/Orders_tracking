@@ -241,7 +241,7 @@ fig_combined.add_trace(
                y=trend_line_values,
                mode='lines+markers',
                line=dict(color='blue', dash='dash'),
-               name='Average Trend')
+               name='Total Trend')
 )
 
 # Display the combined chart with the red lines and the trend line
