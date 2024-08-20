@@ -203,6 +203,21 @@ daily_quantity_combined['Date_Formatted'] = daily_quantity_combined['Date_Format
 
 # Create a single bar chart with all the data
 fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined')
+
+# Add red vertical lines at the start of each date range
+line_positions = [
+    start_date_persian,
+    previous_start_date_persian,
+] + [start for start, end in additional_ranges_persian]
+
+for line_date in line_positions:
+    # Convert line_date to Gregorian format for plotting (since it's in Persian format)
+    gregorian_line_date = persian_to_gregorian(line_date)
+    formatted_line_date = gregorian_line_date.strftime('%Y-%m-%d')
+
+    # Add vertical line
+    fig_combined.add_vline(x=formatted_line_date, line=dict(color='red', width=2))
+    
 st.plotly_chart(fig_combined)
 
 
