@@ -145,12 +145,6 @@ def format_persian_date(date_str):
     return date_str
 
 
-# Aggregate total quantity per day for the current date range
-daily_quantity = current_filtered_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
-
-# Create the bar chart
-fig = px.bar(daily_quantity, x='Date_Formatted', y='Quantity', title='Total Quantity per Day')
-st.plotly_chart(fig)
 
 
 # Create additional date ranges
