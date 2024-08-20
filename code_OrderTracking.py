@@ -225,7 +225,7 @@ for i in range(len(line_positions) - 1):
         average_quantities.append((end_line, avg_quantity))
 
 # Add the final segment from the last red line to the end of the data
-final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions_gregorian[-1].strftime('%Y-%m-%d')]
+# final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions_gregorian[-1].strftime('%Y-%m-%d')]
 
 if not final_segment_df.empty:
     avg_quantity = final_segment_df['Quantity'].sum()
