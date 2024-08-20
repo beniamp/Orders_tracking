@@ -228,7 +228,7 @@ if len(line_positions) > 0:
     final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions[-1]]
     if not final_segment_df.empty:
         avg_quantity = final_segment_df['Quantity'].sum()
-        average_quantities.append((final_segment_df['Date_Formatted'].avg(), avg_quantity))
+        average_quantities.append((final_segment_df['Date_Formatted'].mean(), avg_quantity))
 
 # Add a trace for the trend line
 trend_line_dates = [date for date, _ in average_quantities]
