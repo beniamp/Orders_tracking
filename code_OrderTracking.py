@@ -210,8 +210,8 @@ average_quantities = []
 
 # Loop through each segment between red lines
 for i in range(len(line_positions) - 1):
-    end_line = line_positions[i]
-    start_line = line_positions[i + 1]
+    start_line = line_positions[i]
+    end_line = line_positions[i + 1]
     print(f'{start_line} and {end_line}')
 
     # Filter data between the start and end lines
