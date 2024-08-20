@@ -206,9 +206,9 @@ fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity',
 
 # Add red vertical lines at the start of each date range
 line_positions = [
-    start_date_persian,
-    previous_start_date_persian,
-] + [start for start, end in additional_ranges_persian]
+    start_date,
+    previous_start_date,
+] + [gregorian_to_persian(start) for start, end in additional_ranges]
 
 for line_date in line_positions:
     # Convert line_date to Gregorian format for plotting (since it's in Persian format)
@@ -216,7 +216,7 @@ for line_date in line_positions:
     formatted_line_date = gregorian_line_date.strftime('%Y-%m-%d')
 
     # Add vertical line
-    fig_combined.add_vline(x=formatted_line_date, line=dict(color='red', width=2))
+    fig_combined.add_vline(x=formatted_line_date, line_dash="dash", line_color="red", line_width=3)
     
 st.plotly_chart(fig_combined)
 
