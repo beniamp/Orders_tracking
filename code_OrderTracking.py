@@ -220,14 +220,14 @@ for i in range(len(line_positions) - 1):
 
     if not segment_df.empty:
         # Calculate the average quantity for this segment
-        avg_quantity = segment_df['Quantity'].mean()
+        avg_quantity = segment_df['Quantity'].sum()
         average_quantities.append((end_line, avg_quantity))
 
 # Handle the final segment after the last red line
 if len(line_positions) > 0:
     final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions[-1]]
     if not final_segment_df.empty:
-        avg_quantity = final_segment_df['Quantity'].mean()
+        avg_quantity = final_segment_df['Quantity'].sum()
         average_quantities.append((final_segment_df['Date_Formatted'].max(), avg_quantity))
 
 # Add a trace for the trend line
@@ -245,7 +245,5 @@ fig_combined.add_trace(
 # Display the combined chart with the red lines and the trend line
 st.plotly_chart(fig_combined)
 
-
-st.plotly_chart(fig_combined)
 
 
