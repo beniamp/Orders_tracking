@@ -206,6 +206,8 @@ for line_date in line_positions:
 
 
 
+
+
 # Calculate the average quantity for each segment between red lines
 total_quantities = []
 
@@ -218,6 +220,7 @@ for i in range(len(line_positions) - 1):
     # Filter data between the start and end lines
     segment_df = combined_df_sorted[(combined_df_sorted['Date_Formatted'] >= start_line) & 
                                     (combined_df_sorted['Date_Formatted'] < end_line)]
+    print(segment_df)
 
     if not segment_df.empty:
         # Calculate th-e average quantity for this segment
@@ -231,14 +234,12 @@ if len(line_positions) > 0:
     if not final_segment_df.empty:
         tot_quantity = final_segment_df['Quantity'].sum()
         total_quantities.append((final_segment_df['Date_Formatted'].max(), tot_quantity))
-
+        
 # Add a trace for the trend line
 trend_line_dates = [date for date, _ in total_quantities]
 trend_line_values = [quantity for _, quantity in total_quantities]
 trend_line_dates = trend_line_dates[:-1]
 trend_line_values = trend_line_values[:-1]
-
-
 
 
 fig_combined.add_trace(
@@ -248,6 +249,7 @@ fig_combined.add_trace(
                line=dict(color='blue', dash='dash'),
                name='Total Trend')
 )
+
 
 # Display the combined chart with the red lines and the trend line
 st.plotly_chart(fig_combined)
