@@ -161,14 +161,6 @@ additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(
 
 
 
-
-# Generate additional date ranges
-additional_ranges = []
-for i in range(1, 6):
-    additional_start_date = start_date - timedelta(days=num_days * i)
-    additional_end_date = end_date - timedelta(days=num_days * i)
-    additional_ranges.append((additional_start_date, additional_end_date))
-
 # Combine the current, previous, and additional date ranges
 all_ranges_dfs = [current_filtered_df, previous_filtered_df]
 
