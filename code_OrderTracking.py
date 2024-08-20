@@ -238,8 +238,8 @@ if len(line_positions) > 0:
 # Add a trace for the trend line
 trend_line_dates = [date for date, _ in total_quantities]
 trend_line_values = [quantity for _, quantity in total_quantities]
-trend_line_dates = trend_line_dates[:-1]
-trend_line_values = trend_line_values[:-1]
+#trend_line_dates = trend_line_dates[:-1]
+#trend_line_values = trend_line_values[:-1]
 
 
 fig_combined.add_trace(
