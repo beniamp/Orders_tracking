@@ -187,46 +187,33 @@ daily_quantity = current_filtered_df.groupby('Date_Formatted')['Quantity'].sum()
 fig = px.bar(daily_quantity, x='Date_Formatted', y='Quantity', title='Total Quantity per Day')
 #st.plotly_chart(fig)
 
+# Combine the current, previous, and additional date ranges
+all_ranges_dfs = [current_filtered_df, previous_filtered_df]
 
-
-# Create additional date ranges
-additional_ranges = []
-for i in range(1, 6):
-    additional_start_date = start_date - timedelta(days=num_days * i)
-    additional_end_date = end_date - timedelta(days=num_days * i)
-    additional_ranges.append((additional_start_date, additional_end_date))
-
-# Convert additional date ranges to Persian format
-additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(end)) for start, end in additional_ranges]
-
-# Display the additional date ranges and their metrics
-st.write("Additional Date Ranges:")
-
+# Adding additional date range data
 for idx, (start, end) in enumerate(additional_ranges_persian):
-    st.write(f"Range {idx + 1}: {start} to {end}")
-
-    # Filter DataFrame for this additional range
     additional_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start) & (df_orders['Date_Formatted'] <= end)]
-
+    
     # Apply category filter if necessary
     if selected_category != 'All Categories':
         additional_filtered_df = additional_filtered_df[additional_filtered_df['Category'] == selected_category]
+    
+    all_ranges_dfs.append(additional_filtered_df)
 
-    # Calculate metrics for this additional date range
-    additional_total_sales = additional_filtered_df['TotalPrice'].sum()
-    additional_total_volume = additional_filtered_df['Quantity'].sum()
-    additional_total_net = additional_filtered_df['TotalNetPrice'].sum()
+# Concatenate all dataframes into one
+combined_df = pd.concat(all_ranges_dfs)
 
-    # Display metrics
-    a1, a2, a3 = st.columns(3)
-    a1.metric(f"Range {idx + 1} Price", "{:,}".format(additional_total_sales))
-    a2.metric(f"Range {idx + 1} Volume", "{:,}".format(additional_total_volume))
-    a3.metric(f"Range {idx + 1} Net Price", "{:,}".format(additional_total_net))
+# Sort the combined DataFrame by date
+combined_df_sorted = combined_df.sort_values(by='Date_Formatted')
 
-    # Optional: Aggregate total quantity per day for this range and plot
-    daily_quantity_additional = additional_filtered_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
-    fig_additional = px.bar(daily_quantity_additional, x='Date_Formatted', y='Quantity', title=f'Total Quantity per Day - Range {idx + 1}')
-    st.plotly_chart(fig_additional)
+# Aggregate total quantity per day for all ranges combined
+daily_quantity_combined = combined_df_sorted.groupby('Date_Formatted')['Quantity'].sum().reset_index()
 
+# Convert the dates to readable Persian format for plotting
+daily_quantity_combined['Date_Formatted'] = daily_quantity_combined['Date_Formatted'].apply(format_persian_date)
+
+# Create a single bar chart with all the data
+fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined')
+st.plotly_chart(fig_combined)
 
 
