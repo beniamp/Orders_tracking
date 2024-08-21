@@ -179,9 +179,6 @@ combined_df_sorted = combined_df.sort_values(by='Date_Formatted')
 daily_quantity_combined = combined_df_sorted.groupby('Date_Formatted')['Quantity'].sum().reset_index()
 
 
-# Convert the dates to readable Persian format for plotting
-daily_quantity_combined['Date_Formatted'] = daily_quantity_combined['Date_Formatted'].apply(format_persian_date)
-
 
 # Create a single bar chart with all the data
 fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined', color_discrete_sequence=['#636EFA'])
