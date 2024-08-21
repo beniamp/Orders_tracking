@@ -27,12 +27,16 @@ categories = ['All Categories'] + df_orders['Category'].unique().tolist()
 df_orders['Date_Formatted'] = df_orders['Date_Formatted'].fillna('0000-00-00')
 df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 
+# Ensure date is a string format
+df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
+sorted_dates = sorted(df_orders['Date_Formatted'].unique())
+
 # Function to convert Persian date to Gregorian date
 def persian_to_gregorian(persian_date_str):
     year, month, day = map(int, persian_date_str.split('-'))
     gregorian_date = persian.to_gregorian(year, month, day)
     return datetime(gregorian_date[0], gregorian_date[1], gregorian_date[2])
-
+    
 # Convert Persian dates to Gregorian
 df_orders['Gregorian_Date'] = df_orders['Date_Formatted'].apply(persian_to_gregorian)
 
@@ -72,27 +76,25 @@ filtered_df = df_orders[
     (df_orders['Gregorian_Date'] <= end_date)
 ]
 
-# Filter DataFrame by category if necessary
+# Filter DataFrame by current and previous date ranges
+current_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start_date_persian) & (df_orders['Date_Formatted'] <= end_date_persian)]
+previous_filtered_df = df_orders[(df_orders['Date_Formatted'] >= previous_start_date_persian) & (df_orders['Date_Formatted'] <= previous_end_date_persian)]
+
+# Apply category filter if necessary
 if selected_category != 'All Categories':
-    filtered_df = filtered_df[filtered_df['Category'] == selected_category]
+    current_filtered_df = current_filtered_df[current_filtered_df['Category'] == selected_category]
+    previous_filtered_df = previous_filtered_df[previous_filtered_df['Category'] == selected_category]
 
 # Calculate metrics for the current date range
-current_total_sales = filtered_df['TotalPrice'].sum()
-current_total_volume = filtered_df['Quantity'].sum()
-current_total_net = filtered_df['TotalNetPrice'].sum()
-
-# Filter DataFrame for previous date range
-previous_filtered_df = df_orders[
-    (df_orders['Gregorian_Date'] >= previous_start_date) &
-    (df_orders['Gregorian_Date'] <= previous_end_date)
-]
-if selected_category != 'All Categories':
-    previous_filtered_df = previous_filtered_df[previous_filtered_df['Category'] == selected_category]
+current_total_sales = current_filtered_df['TotalPrice'].sum()
+current_total_volume = current_filtered_df['Quantity'].sum()
+current_total_net = current_filtered_df['TotalNetPrice'].sum()
 
 # Calculate metrics for the previous date range
 previous_total_sales = previous_filtered_df['TotalPrice'].sum()
 previous_total_volume = previous_filtered_df['Quantity'].sum()
 previous_total_net = previous_filtered_df['TotalNetPrice'].sum()
+
 
 # Calculate growth percentages
 sales_growth = ((current_total_sales - previous_total_sales) / previous_total_sales) * 100 if previous_total_sales else 0
@@ -104,6 +106,7 @@ formatted_total_sales = "{:,}".format(current_total_sales)
 formatted_total_volume = "{:,}".format(current_total_volume)
 formatted_total_net = "{:,}".format(current_total_net)
 
+
 st.write(f'Domain of period time: {num_days}')
 st.write(f'Current period range: {start_date_persian} to {end_date_persian}')
 st.write(f'Previous period range: {previous_start_date_persian} to {previous_end_date_persian}')
@@ -114,54 +117,128 @@ a2.metric("Overall Price", formatted_total_sales, f"{sales_growth:.2f}%")
 a3.metric("Overall Volume", formatted_total_volume, f"{volume_growth:.2f}%")
 a4.metric("Overall Net Price", formatted_total_net, f"{net_growth:.2f}%")
 
-# Function to create and return the Altair plot
-def create_plot():
-    # Prepare data for Altair
-    df_orders_to_plot = df_orders.copy()
-    if selected_category != 'All Categories':
-        df_orders_to_plot = df_orders_to_plot[df_orders_to_plot['Category'] == selected_category]
+# Customizing Persian month to corresponding month name by dictionary
+persian_months = {'01': 'Far', '02': 'Ord', '03': 'Kho',
+                  '04': 'Tir', '05': 'Mor', '06': 'Sha',
+                  '07': 'Meh', '08': 'Aba', '09': 'Aza',
+                  '10': 'Dey', '11': 'Bah', '12': 'Esf'}
 
-    # Sort the DataFrame by Gregorian date for consistency
-    df_orders_to_plot = df_orders_to_plot.sort_values(by='Gregorian_Date')
+def format_persian_date(date_str):
+    if not date_str:
+        return None
+    parts = date_str.split('-')
+    if len(parts) == 3:
+        year, month, day = parts
+        persian_month = persian_months.get(month, month)
+        return f'{persian_month} {day}'
+    return date_str
 
-    # Altair plot
-    bar_chart = alt.Chart(df_orders_to_plot).mark_bar(opacity=0.6).encode(
-        x=alt.X('Gregorian_Date:T', title='Date'),
-        y=alt.Y('Quantity:Q', title='Quantity'),
-        color=alt.value('blue'),
-        tooltip=['Gregorian_Date:T', 'Quantity:Q']
-    ).properties(
-        title='Daily Quantity'
-    )
 
-    # Calculate sums for each range and plot trend lines
-    range_sums = []
-    for i in range(num_days, len(sorted_dates_gregorian) + 1, num_days):
-        range_sum = df_orders_to_plot[
-            (df_orders_to_plot['Gregorian_Date'] >= sorted_dates_gregorian[i-num_days]) &
-            (df_orders_to_plot['Gregorian_Date'] < sorted_dates_gregorian[i])
-        ]['Quantity'].sum()
-        range_sums.append(range_sum)
+# Create additional date ranges
+additional_ranges = []
+for i in range(0, 6):
+    additional_start_date = start_date - timedelta(days=num_days * i)
+    additional_end_date = end_date - timedelta(days=num_days * i)
+    additional_ranges.append((additional_start_date, additional_end_date))
+
+# Convert additional date ranges to Persian format
+additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(end)) for start, end in additional_ranges]
+
+all_ranges_dfs = []
+
+# Adding additional date range data
+for idx, (start, end) in enumerate(additional_ranges_persian):
+    additional_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start) & (df_orders['Date_Formatted'] <= end)]
     
-    # Create trend line data
-    trend_data = pd.DataFrame({
-        'Date': [sorted_dates_gregorian[i*num_days-1] for i in range(len(range_sums))],
-        'Sum': range_sums
-    })
+    # Apply category filter if necessary
+    if selected_category != 'All Categories':
+        additional_filtered_df = additional_filtered_df[additional_filtered_df['Category'] == selected_category]
+    additional_filtered_df['Range_Number'] = idx
 
-    trend_line = alt.Chart(trend_data).mark_line(color='red', strokeDash=[5, 5]).encode(
-        x=alt.X('Date:T', title='Date'),
-        y=alt.Y('Sum:Q', title='Quantity'),
-        tooltip=['Date:T', 'Sum:Q']
-    ).properties(
-        title='Trend Line (Sum of Ranges)'
-    )
+    all_ranges_dfs.append(additional_filtered_df)
+    
 
-    # Combine charts
-    combined_chart = bar_chart + trend_line
-    return combined_chart
+combined_df = pd.concat(all_ranges_dfs, ignore_index=True)
+# Sort the combined DataFrame by date
+combined_df_sorted = combined_df.sort_values(by='Date_Formatted')
+# Aggregate total quantity per day for all ranges combined
+daily_quantity_combined = combined_df_sorted.groupby('Date_Formatted')['Quantity'].sum().reset_index()
 
-# Button to generate plot
-if st.button('Generate Plot'):
-    plot = create_plot()
-    st.altair_chart(plot, use_container_width=True)
+
+# Create a single bar chart with all the data
+fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined', color_discrete_sequence=['#636EFA'])
+fig_combined.update_xaxes(type='category')
+
+line_positions = [end for start, end in additional_ranges_persian]
+
+line_pos = []
+for i in line_positions:
+  if i in combined_df['Date_Formatted'].unique():
+    line_pos.append(i)
+
+  # Create the bar chart
+fig_combined = px.bar(
+    daily_quantity_combined,
+    x='Date_Formatted',
+    y='Quantity',
+    title='Total Quantity per Day - All Date Ranges Combined',
+    color_discrete_sequence=['#636EFA']
+)
+
+
+
+# Add red vertical lines at the start of each date range
+for line_date in line_pos:
+    print(line_date)
+    
+    # Add vertical line
+    fig_combined.add_vline(x=line_date, fillcolor='red')
+# Ensure the x-axis is categorical
+fig_combined.update_xaxes(type='category')
+
+
+# Calculate the average quantity for each segment between red lines
+total_quantities = []
+average_quantities = []
+
+# Loop through each segment between red lines
+for i, ii in additional_ranges_persian:
+    end_line = ii
+    start_line = i
+    print(f'{start_line} and {end_line}')
+
+    # Filter data between the start and end lines
+    segment_df = combined_df_sorted[(combined_df_sorted['Date_Formatted'] >= start_line) & 
+                                    (combined_df_sorted['Date_Formatted'] <= end_line)]
+
+
+    if not segment_df.empty:
+        # Calculate th-e average quantity for this segment
+        tot_quantity = segment_df['Quantity'].sum()
+        avg_quantity = tot_quantity / num_days
+        total_quantities.append((end_line, tot_quantity))
+        average_quantities.append((end_line, round(avg_quantity)))
+
+
+# Handle the final segment after the last red line
+#if len(line_positions) > 0:
+#    final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions[-1]]
+#    if not final_segment_df.empty:
+#        tot_quantity = final_segment_df['Quantity'].sum()
+#        total_quantities.append((final_segment_df['Date_Formatted'].max(), tot_quantity))
+        
+# Add a trace for the trend line
+trend_line_dates = [date for date,_ in total_quantities]
+trend_line_values = [quantity for _, quantity in total_quantities]
+
+
+fig_combined.add_trace(
+    go.Scatter(x=[date for date in trend_line_dates],
+               y=trend_line_values,
+               mode='lines+markers',
+               line=dict(color='blue', dash='dash'),
+               name='Total Trend')
+)
+
+
+st.show(fig)
