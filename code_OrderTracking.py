@@ -46,6 +46,7 @@ df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
 sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 
+
 # Function to convert Persian date to Gregorian date
 def persian_to_gregorian(persian_date_str):
     year, month, day = map(int, persian_date_str.split('-'))
@@ -53,8 +54,9 @@ def persian_to_gregorian(persian_date_str):
     return datetime(gregorian_date[0], gregorian_date[1], gregorian_date[2])
 
 # Convert Persian dates to Gregorian
-sorted_dates_persian = sorted_dates 
+sorted_dates_persian = sorted_dates
 sorted_dates_gregorian = [persian_to_gregorian(date) for date in sorted_dates_persian]
+
 
 # Date range selection using calendar widget
 b1, b2 = st.columns(2)
@@ -85,9 +87,6 @@ previous_end_date = end_date - timedelta(days=num_days)
 previous_start_date_persian = gregorian_to_persian(previous_start_date)
 previous_end_date_persian = gregorian_to_persian(previous_end_date)
 
-# Filter DataFrame by date and category
-filtered_dates_persian = [date for date in sorted_dates if start_date_persian <= date <= end_date_persian]
-filtered_df = df_orders[df_orders['Date_Formatted'].isin(filtered_dates_persian)]
 
 # Filter DataFrame by current and previous date ranges
 current_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start_date_persian) & (df_orders['Date_Formatted'] <= end_date_persian)]
@@ -108,6 +107,7 @@ previous_total_sales = previous_filtered_df['TotalPrice'].sum()
 previous_total_volume = previous_filtered_df['Quantity'].sum()
 previous_total_net = previous_filtered_df['TotalNetPrice'].sum()
 
+
 # Calculate growth percentages
 sales_growth = ((current_total_sales - previous_total_sales) / previous_total_sales) * 100 if previous_total_sales else 0
 volume_growth = ((current_total_volume - previous_total_volume) / previous_total_volume) * 100 if previous_total_volume else 0
@@ -116,7 +116,7 @@ net_growth = ((current_total_net - previous_total_net) / previous_total_net) * 1
 # Formatting the metrics
 formatted_total_sales = "{:,}".format(current_total_sales)
 formatted_total_volume = "{:,}".format(current_total_volume)
-formatted_total_net = "{:,}".format(round(current_total_net))
+formatted_total_net = "{:,}".format(current_total_net)
 
 
 st.write(f'Domain of period time: {num_days}')
@@ -150,7 +150,7 @@ def format_persian_date(date_str):
 daily_quantity = current_filtered_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
 
 
-# Create additional date ranges
+## Create additional date ranges
 additional_ranges = []
 for i in range(0, 6):
     additional_start_date = start_date - timedelta(days=num_days * i)
@@ -161,9 +161,7 @@ for i in range(0, 6):
 additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(end)) for start, end in additional_ranges]
 
 
-
-# Combine the current, previous, and additional date ranges
-all_ranges_dfs = [current_filtered_df, previous_filtered_df]
+all_ranges_dfs = []
 
 # Adding additional date range data
 for idx, (start, end) in enumerate(additional_ranges_persian):
@@ -172,17 +170,17 @@ for idx, (start, end) in enumerate(additional_ranges_persian):
     # Apply category filter if necessary
     if selected_category != 'All Categories':
         additional_filtered_df = additional_filtered_df[additional_filtered_df['Category'] == selected_category]
-    
+    additional_filtered_df['Range_Number'] = idx
+
     all_ranges_dfs.append(additional_filtered_df)
+    
 
-# Concatenate all dataframes into one
-combined_df = pd.concat(all_ranges_dfs)
-
+combined_df = pd.concat(all_ranges_dfs, ignore_index=True)
 # Sort the combined DataFrame by date
 combined_df_sorted = combined_df.sort_values(by='Date_Formatted')
-
 # Aggregate total quantity per day for all ranges combined
 daily_quantity_combined = combined_df_sorted.groupby('Date_Formatted')['Quantity'].sum().reset_index()
+
 
 # Convert the dates to readable Persian format for plotting
 daily_quantity_combined['Date_Formatted'] = daily_quantity_combined['Date_Formatted'].apply(format_persian_date)
@@ -191,64 +189,78 @@ daily_quantity_combined['Date_Formatted'] = daily_quantity_combined['Date_Format
 fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined')
 
 
+# Create a single bar chart with all the data
+fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined', color_discrete_sequence=['#636EFA'])
+fig_combined.update_xaxes(type='category')
 
-# Add red vertical lines at the start of each date range
-line_positions = [
-    start_date_persian,
-    previous_start_date_persian,
-] + [start for start, end in additional_ranges_persian]
+line_positions = [end for start, end in additional_ranges_persian]
 
-for line_date in line_positions:
-
-    formatted_line_date = format_persian_date(line_date)
-
-    # Add vertical line
-    fig_combined.add_vline(x=formatted_line_date, line_color="red", line_width=1)
-    
+line_pos = []
+for i in line_positions:
+  if i in combined_df['Date_Formatted'].unique():
+    line_pos.append(i)
 
 
 # Display the combined chart with the red lines
+  # Create the bar chart
+fig_combined = px.bar(
+    daily_quantity_combined,
+    x='Date_Formatted',
+    y='Quantity',
+    title='Total Quantity per Day - All Date Ranges Combined',
+    color_discrete_sequence=['#636EFA']
+)
 
 
+
+# Add red vertical lines at the start of each date range
+for line_date in line_pos:
+    print(line_date)
+    
+    # Add vertical line
+    fig_combined.add_vline(x=line_date, fillcolor='red')
+# Ensure the x-axis is categorical
+fig_combined.update_xaxes(type='category')
 
 
 
 # Calculate the average quantity for each segment between red lines
 total_quantities = []
+average_quantities = []
 
 # Loop through each segment between red lines
-for i in range(len(line_positions) - 1):
-    end_line = line_positions[i]
-    start_line = line_positions[i + 1]
+for i, ii in additional_ranges_persian:
+    end_line = ii
+    start_line = i
     print(f'{start_line} and {end_line}')
 
     # Filter data between the start and end lines
     segment_df = combined_df_sorted[(combined_df_sorted['Date_Formatted'] >= start_line) & 
-                                    (combined_df_sorted['Date_Formatted'] < end_line)]
-    print(segment_df)
+                                    (combined_df_sorted['Date_Formatted'] <= end_line)]
+
 
     if not segment_df.empty:
         # Calculate th-e average quantity for this segment
         tot_quantity = segment_df['Quantity'].sum()
+        avg_quantity = tot_quantity / num_days
         total_quantities.append((end_line, tot_quantity))
-        
+        average_quantities.append((end_line, round(avg_quantity)))
+
 
 # Handle the final segment after the last red line
-if len(line_positions) > 0:
-    final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions[-1]]
-    if not final_segment_df.empty:
-        tot_quantity = final_segment_df['Quantity'].sum()
-        total_quantities.append((final_segment_df['Date_Formatted'].max(), tot_quantity))
+#if len(line_positions) > 0:
+#    final_segment_df = combined_df_sorted[combined_df_sorted['Date_Formatted'] >= line_positions[-1]]
+#    if not final_segment_df.empty:
+#        tot_quantity = final_segment_df['Quantity'].sum()
+#        total_quantities.append((final_segment_df['Date_Formatted'].max(), tot_quantity))
         
 # Add a trace for the trend line
-trend_line_dates = [date for date, _ in total_quantities]
+trend_line_dates = [date for date,_ in total_quantities]
 trend_line_values = [quantity for _, quantity in total_quantities]
-trend_line_dates = trend_line_dates[:-1]
-trend_line_values = trend_line_values[:-1]
 
 
 fig_combined.add_trace(
-    go.Scatter(x=[format_persian_date(date) for date in trend_line_dates],
+    go.Scatter(x=[date for date in trend_line_dates],
                y=trend_line_values,
                mode='lines+markers',
                line=dict(color='blue', dash='dash'),
