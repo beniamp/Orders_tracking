@@ -116,8 +116,8 @@ net_growth = ((current_total_net - previous_total_net) / previous_total_net) * 1
 # Formatting the metrics
 formatted_total_sales = "{:,}".format(current_total_sales)
 formatted_total_volume = "{:,}".format(current_total_volume)
-formatted_total_net = "{:,}".format(current_total_net)
-formatted_total_net = round(formatted_total_net)
+formatted_total_net = "{:,}".format(round(current_total_net))
+
 
 st.write(f'Domain of period time: {num_days}')
 st.write(f'Current period range:{start_date_persian} to {end_date_persian}')
