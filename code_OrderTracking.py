@@ -146,9 +146,6 @@ def format_persian_date(date_str):
     return date_str
 
 
-# Aggregate total quantity per day for the current date range
-daily_quantity = current_filtered_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
-
 
 ## Create additional date ranges
 additional_ranges = []
