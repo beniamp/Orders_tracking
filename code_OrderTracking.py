@@ -254,8 +254,8 @@ fig_combined.add_trace(
     go.Scatter(x=[date for date in trend_line_dates],
                y=trend_line_values,
                mode='lines+markers',
-               line=dict(color='red', dash='dash'),
-               name='Total Trend')
+               line=dict(color='yellow', dash='dash'),
+               name='Totall Trend')
 )
 
 
