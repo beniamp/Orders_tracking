@@ -246,8 +246,8 @@ for i, ii in additional_ranges_persian:
 #        total_quantities.append((final_segment_df['Date_Formatted'].max(), tot_quantity))
         
 # Add a trace for the trend line
-trend_line_dates = [date for date,_ in total_quantities]
-trend_line_values = [quantity for _, quantity in total_quantities]
+trend_line_dates = [date for date,_ in average_quantities]
+trend_line_values = [quantity for _, quantity in average_quantities]
 
 
 fig_combined.add_trace(
