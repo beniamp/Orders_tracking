@@ -111,7 +111,7 @@ previous_total_net = previous_filtered_df['TotalNetPrice'].sum()
 # Calculate growth percentages
 sales_growth = ((current_total_sales - previous_total_sales) / previous_total_sales) * 100 if previous_total_sales else 0
 volume_growth = ((current_total_volume - previous_total_volume) / previous_total_volume) * 100 if previous_total_volume else 0
-net_growth = ((current_total_net - previous_total_net) / previous_total_net) * 100 if previous_total_net else 0
+net_growth = round(((current_total_net - previous_total_net) / previous_total_net) * 100) if previous_total_net else 0
 
 # Formatting the metrics
 formatted_total_sales = "{:,}".format(current_total_sales)
