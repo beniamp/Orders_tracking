@@ -163,20 +163,27 @@ all_ranges_dfs = []
 # Adding additional date range data
 for idx, (start, end) in enumerate(additional_ranges_persian):
     additional_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start) & (df_orders['Date_Formatted'] <= end)]
-    
+
     # Apply category filter if necessary
     if selected_category != 'All Categories':
         additional_filtered_df = additional_filtered_df[additional_filtered_df['Category'] == selected_category]
     additional_filtered_df['Range_Number'] = idx
 
     all_ranges_dfs.append(additional_filtered_df)
-    
+
+
+
+all_dates= sorted_dates 
+daily_quantity_combined = combined_df_sorted.groupby('Date_Formatted')['Quantity'].sum().reset_index()
 
 combined_df = pd.concat(all_ranges_dfs, ignore_index=True)
-# Sort the combined DataFrame by date
-combined_df_sorted = combined_df.sort_values(by='Date_Formatted')
-# Aggregate total quantity per day for all ranges combined
-daily_quantity_combined = combined_df_sorted.groupby('Date_Formatted')['Quantity'].sum().reset_index()
+
+# Reindex with all possible dates and fill missing values with 0
+daily_quantity_combined = daily_quantity_combined.set_index('Date_Formatted').reindex(all_dates, fill_value=0).reset_index()
+
+# Rename the index column back to 'Date_Formatted'
+daily_quantity_combined.rename(columns={'index': 'Date_Formatted'}, inplace=True)
+
 
 
 
