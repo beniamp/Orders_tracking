@@ -231,8 +231,8 @@ for i, ii in additional_ranges_persian:
     print(f'{start_line} and {end_line}')
 
     # Filter data between the start and end lines
-    segment_df = combined_df_sorted[(combined_df_sorted['Date_Formatted'] >= start_line) & 
-                                    (combined_df_sorted['Date_Formatted'] <= end_line)]
+    segment_df = combined_df[(combined_df['Date_Formatted'] >= start_line) & 
+                                    (combined_df['Date_Formatted'] <= end_line)]
 
 
     if not segment_df.empty:
