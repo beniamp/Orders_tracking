@@ -172,11 +172,9 @@ for idx, (start, end) in enumerate(additional_ranges_persian):
     all_ranges_dfs.append(additional_filtered_df)
 
 
-
-all_dates= sorted_dates 
-daily_quantity_combined = combined_df_sorted.groupby('Date_Formatted')['Quantity'].sum().reset_index()
-
 combined_df = pd.concat(all_ranges_dfs, ignore_index=True)
+all_dates= sorted_dates 
+daily_quantity_combined = combined_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
 
 # Reindex with all possible dates and fill missing values with 0
 daily_quantity_combined = daily_quantity_combined.set_index('Date_Formatted').reindex(all_dates, fill_value=0).reset_index()
