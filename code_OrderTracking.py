@@ -173,6 +173,8 @@ for idx, (start, end) in enumerate(additional_ranges_persian):
 
 
 combined_df = pd.concat(all_ranges_dfs, ignore_index=True)
+combined_df_sorted = combined_df.sort_values(by='Date_Formatted')
+
 all_dates= sorted_dates 
 daily_quantity_combined = combined_df.groupby('Date_Formatted')['Quantity'].sum().reset_index()
 
@@ -231,8 +233,8 @@ for i, ii in additional_ranges_persian:
     print(f'{start_line} and {end_line}')
 
     # Filter data between the start and end lines
-    segment_df = combined_df[(combined_df['Date_Formatted'] >= start_line) & 
-                                    (combined_df['Date_Formatted'] <= end_line)]
+    segment_df = combined_df_sorted[(combined_df_sorted['Date_Formatted'] >= start_line) & 
+                                    (combined_df_sorted['Date_Formatted'] <= end_line)]
 
 
     if not segment_df.empty:
