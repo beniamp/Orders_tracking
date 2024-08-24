@@ -329,6 +329,8 @@ if product_quantities_by_range:
     # Display the summary table
     st.write("Total Quantity by Product for Each Date Range")
     st.write(summary_df)
+    count_products = summary_df.shape()
+    st.write(count_products)
 else:
     st.write("No valid date ranges with data found.")
 
