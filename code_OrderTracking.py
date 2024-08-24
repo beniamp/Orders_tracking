@@ -149,7 +149,7 @@ def format_persian_date(date_str):
 
 ## Create additional date ranges
 additional_ranges = []
-for i in range(0, 20):
+for i in range(0, 22):
     additional_start_date = start_date - timedelta(days=num_days * i)
     additional_end_date = end_date - timedelta(days=num_days * i)
     additional_ranges.append((additional_start_date, additional_end_date))
