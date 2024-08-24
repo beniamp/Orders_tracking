@@ -370,7 +370,7 @@ fig_trend.add_trace(
         y=quantities,
         mode='lines+markers',
         line=dict(color='red', width=2),
-        marker=dict(size=8, color='blue'),
+        marker=dict(size=8, color='black'),
         name='Quantity Trend'
     )
 )
@@ -381,7 +381,7 @@ fig_trend.update_layout(
     xaxis_title='Date Range',
     yaxis_title='Quantity',
     xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
-    plot_bgcolor='grey'
+    plot_bgcolor='white'
 )
 
 # Display the trend line chart
