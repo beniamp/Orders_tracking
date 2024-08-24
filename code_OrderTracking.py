@@ -329,6 +329,8 @@ else:
 
 
 
+# Assuming summary_df is already created and contains the necessary data
+
 # Create a list of distinct product names from the summary_df
 product_names = summary_df['ProductName'].unique()
 
@@ -344,10 +346,16 @@ def get_trend_data(product_name, summary_df):
     date_ranges = product_data.columns[1:-2]  # Exclude ProductName, Total Quantity, Max Quantity, Max Quantity Date Range
     quantities = product_data.iloc[0, 1:-3]  # Get the quantities for the selected product
     
-    return date_ranges, quantities
+    # Create a DataFrame to sort date ranges
+    trend_data = pd.DataFrame({'Date Range': date_ranges, 'Quantity': quantities})
+    
+    # Sort the DataFrame by Date Range in descending order
+    trend_data = trend_data.sort_values(by='Date Range', ascending=False)
+    
+    return trend_data
 
 # Get trend data for the selected product
-date_ranges, quantities = get_trend_data(selected_product, summary_df)
+trend_data = get_trend_data(selected_product, summary_df)
 
 # Create the trend line chart
 fig_trend = go.Figure()
@@ -355,8 +363,8 @@ fig_trend = go.Figure()
 # Add trace for the trend line
 fig_trend.add_trace(
     go.Scatter(
-        x=date_ranges,
-        y=quantities,
+        x=trend_data['Date Range'],
+        y=trend_data['Quantity'],
         mode='lines+markers',
         line=dict(color='blue', width=2),
         marker=dict(size=8, color='blue'),
@@ -369,7 +377,7 @@ fig_trend.update_layout(
     title=f'Quantity Trend for {selected_product}',
     xaxis_title='Date Range',
     yaxis_title='Quantity',
-    xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
+    xaxis=dict(tickangle=-45, categoryorder='total descending'),  # Ensure dates are in descending order
     plot_bgcolor='white'
 )
 
