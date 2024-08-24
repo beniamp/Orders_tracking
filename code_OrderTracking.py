@@ -147,15 +147,22 @@ def format_persian_date(date_str):
 
 
 
-## Create additional date ranges
+# Create a widget to adjust the number of divisions
+num_divisions = st.slider("Select Number of Divisions", min_value=1, max_value=50, value=20)
+
+# Create additional date ranges based on the selected number of divisions
 additional_ranges = []
-for i in range(0, 22):
+for i in range(0, num_divisions):
     additional_start_date = start_date - timedelta(days=num_days * i)
     additional_end_date = end_date - timedelta(days=num_days * i)
     additional_ranges.append((additional_start_date, additional_end_date))
 
 # Convert additional date ranges to Persian format
 additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(end)) for start, end in additional_ranges]
+
+# Display additional date ranges for verification
+st.write("Additional Date Ranges:")
+st.write(additional_ranges_persian)
 
 
 all_ranges_dfs = []
