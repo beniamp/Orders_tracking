@@ -350,7 +350,7 @@ def get_trend_data(product_name, summary_df):
     trend_data = pd.DataFrame({'Date Range': date_ranges, 'Quantity': quantities})
     
     # Sort the DataFrame by Date Range in descending order
-    trend_data = trend_data.sort_values(by='Date Range', ascending=False)
+    trend_data = trend_data.sort_values(by='Date Range', ascending=True)
     
     return trend_data
 
