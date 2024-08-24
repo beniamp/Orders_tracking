@@ -270,4 +270,61 @@ fig_combined.add_trace(
 st.plotly_chart(fig_combined)
 
 
+import numpy as np
+
+product_quantities_by_range = []
+
+# Filter the date ranges to include only those that have data in df_orders
+filtered_additional_ranges_persian = []
+for start, end in additional_ranges_persian:
+    if df_orders[(df_orders['Date_Formatted'] >= start) & (df_orders['Date_Formatted'] <= end)].shape[0] > 0:
+        filtered_additional_ranges_persian.append((start, end))
+
+# Iterate over the filtered date ranges and calculate quantities
+for idx, (start, end) in enumerate(filtered_additional_ranges_persian):
+    # Filter the DataFrame for the current date range
+    additional_filtered_df = df_orders[(df_orders['Date_Formatted'] >= start) & (df_orders['Date_Formatted'] <= end)]
+
+    # Apply category filter if necessary
+    if selected_category != 'All Categories':
+        additional_filtered_df = additional_filtered_df[additional_filtered_df['Category'] == selected_category]
+    
+    # Group by Product Name and sum the quantities
+    product_quantities = additional_filtered_df.groupby('ProductName')['Quantity'].sum().reset_index()
+    
+    # Add a column for the date range as the column name
+    product_quantities[f'{start} to {end}'] = product_quantities['Quantity']
+    
+    # Keep only the necessary columns
+    product_quantities = product_quantities[['ProductName', f'{start} to {end}']]
+    
+    # Append the result to the list
+    product_quantities_by_range.append(product_quantities)
+
+# Combine all the results into a single DataFrame by merging on ProductName
+if product_quantities_by_range:
+    summary_df = product_quantities_by_range[0]
+    for df in product_quantities_by_range[1:]:
+        summary_df = pd.merge(summary_df, df, on='ProductName', how='outer')
+
+    # Fill NaN values with 0 (if a product has no sales in a date range)
+    summary_df.fillna(0, inplace=True)
+
+    # Calculate the total quantity across all date ranges for sorting (optional)
+    summary_df['Total Quantity'] = summary_df.drop('ProductName', axis=1).sum(axis=1)
+    
+    # Calculate the maximum quantity and the corresponding date range
+    summary_df['Max Quantity'] = summary_df.drop(['ProductName', 'Total Quantity'], axis=1).max(axis=1)
+    summary_df['Max Quantity Date Range'] = summary_df.drop(['ProductName', 'Total Quantity', 'Max Quantity'], axis=1).idxmax(axis=1)
+    
+    # Sort the DataFrame by Total Quantity (optional)
+    summary_df = summary_df.sort_values(by='Total Quantity', ascending=False)
+
+
+    # Display the summary table
+    st.write("Total Quantity by Product for Each Date Range")
+    st.write(summary_df)
+else:
+    st.write("No valid date ranges with data found.")
+
 
