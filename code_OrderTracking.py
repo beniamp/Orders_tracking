@@ -162,7 +162,6 @@ additional_ranges_persian = [(gregorian_to_persian(start), gregorian_to_persian(
 
 # Display additional date ranges for verification
 st.write("Additional Date Ranges:")
-st.write(additional_ranges_persian)
 
 
 all_ranges_dfs = []
