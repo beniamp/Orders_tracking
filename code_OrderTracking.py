@@ -330,6 +330,7 @@ else:
 
 
 
+# Assuming summary_df is already created and contains the necessary data
 
 # Create a list of distinct product names from the summary_df
 product_names = summary_df['ProductName'].unique()
@@ -350,7 +351,7 @@ def get_trend_data(product_name, summary_df):
     trend_data = pd.DataFrame({'Date Range': date_ranges, 'Quantity': quantities})
     
     # Sort the DataFrame by Date Range in descending order
-    trend_data = trend_data.sort_values(by='Date Range', ascending=True)
+    trend_data = trend_data.sort_values(by='Date Range', ascending=False)
     
     return trend_data
 
@@ -383,4 +384,5 @@ fig_trend.update_layout(
 
 # Display the trend line chart
 st.plotly_chart(fig_trend)
+
 
