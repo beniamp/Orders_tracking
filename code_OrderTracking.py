@@ -297,6 +297,40 @@ fig_combined.update_layout(
 # Rotate x-axis labels for better readability
 )
 
+
+
+
+# Calculate the trend line (linear regression)
+x_values = len(daily_quantity_combined['Quantity'])
+y_values = df['Quantity'].values
+coefficients = np.polyfit(x_values, y_values, 1)  # Linear regression
+trend_line = np.polyval(coefficients, x_values)
+
+# Add the trend line as a scatter plot
+fig_combined.add_trace(
+    go.Scatter(
+        x=df['Date_Formatted'], 
+        y=trend_line, 
+        mode='lines+markers', 
+        line=dict(color='red', dash='dash'),
+        name='Trend Line'
+    )
+)
+
+# Add vertical and horizontal lines as before if needed
+
+# Display the combined chart
+fig_combined.update_layout(
+    xaxis_title='Date',
+    yaxis_title='Quantity',
+    plot_bgcolor='white',
+    xaxis=dict(type='category')
+)
+
+
+
+
+
 # Display the combined chart
 st.plotly_chart(fig_combined)
 
