@@ -388,8 +388,8 @@ fig_combined.add_shape(
     x1=daily_quantity_combined['Date_Formatted'].iloc[-1],  # End at the last x position (last date)
     y0=average_quantity,
     y1=average_quantity,
-    xref='x',  # Reference to the x-axis
-    yref='y',  # Reference to the y-axis
+    xref='x',  # Reference to the x-axis (dates)
+    yref='y',  # Reference to the y-axis (quantities)
     line=dict(color="green", width=2, dash="dash"),  # Customize the line color and style
 )
 
@@ -405,3 +405,4 @@ fig_combined.add_annotation(
 
 # Display the combined chart with the red lines and the average line
 st.plotly_chart(fig_combined)
+
