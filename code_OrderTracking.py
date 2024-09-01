@@ -404,4 +404,4 @@ fig_combined.add_annotation(
     font=dict(color="green")
 )
 
-st.plotly_chart(fig_trend)
+st.plotly_chart(fig_combined)
