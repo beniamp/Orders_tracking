@@ -217,7 +217,7 @@ fig_combined = px.bar(
     color_discrete_sequence=['#636EFA']
 )
 
-
+st.write(df_orders)
 
 # Add red vertical lines at the start of each date range
 for line_date in line_pos:
