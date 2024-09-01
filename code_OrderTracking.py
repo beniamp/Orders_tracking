@@ -193,8 +193,6 @@ daily_quantity_combined = daily_quantity_combined.set_index('Date_Formatted').re
 daily_quantity_combined.rename(columns={'index': 'Date_Formatted'}, inplace=True)
 
 
-
-
 # Create a single bar chart with all the data
 fig_combined = px.bar(daily_quantity_combined, x='Date_Formatted', y='Quantity', title='Total Quantity per Day - All Date Ranges Combined', color_discrete_sequence=['#636EFA'])
 fig_combined.update_xaxes(type='category')
@@ -221,8 +219,10 @@ fig_combined = px.bar(
 
 # Add red vertical lines at the start of each date range
 for line_date in line_pos:
+    print(line_date)
+    
     # Add vertical line
-    fig_combined.add_vline(x=line_date, fillcolor='black')
+    fig_combined.add_vline(x=line_date, fillcolor='red')
 # Ensure the x-axis is categorical
 fig_combined.update_xaxes(type='category')
 
@@ -263,38 +263,6 @@ trend_line_dates = [date for date,_ in average_quantities]
 trend_line_values = [quantity for _, quantity in average_quantities]
 
 
-# Create a single bar chart with all the data
-fig_combined = px.bar(
-    daily_quantity_combined,
-    x='Date_Formatted',
-    y='Quantity',
-    title='Total Quantity per Day - All Date Ranges Combined',
-    color_discrete_sequence=['#636EFA']
-)
-
-# Calculate the average quantity
-average_quantity = daily_quantity_combined['Quantity'].mean()
-
-# Add a green horizontal line for the average quantity
-fig_combined.add_hline(y=average_quantity, line_color='green', line_width=2, line_dash='dash', annotation_text="Average", annotation_position="top right")
-
-# Add data labels on top of each bar
-fig_combined.update_traces(texttemplate='%{y}', textposition='outside')
-
-# Update layout to ensure proper display
-fig_combined.update_layout(
-    xaxis_title='Date',
-    yaxis_title='Quantity',
-    plot_bgcolor='white',
-    xaxis=dict(tickangle=-45)  # Rotate x-axis labels for better readability
-)
-
-        
-# Add a trace for the trend line
-trend_line_dates = [date for date,_ in average_quantities]
-trend_line_values = [quantity for _, quantity in average_quantities]
-
-
 fig_combined.add_trace(
     go.Scatter(x=[date for date in trend_line_dates],
                y=trend_line_values,
@@ -303,8 +271,10 @@ fig_combined.add_trace(
                name='Total Trend')
 )
 
-# Display the combined chart
+
+# Display the combined chart with the red lines and the trend line
 st.plotly_chart(fig_combined)
+
 
 
 
@@ -391,6 +361,7 @@ def get_trend_data(product_name, summary_df):
 
 # Get trend data for the selected product
 date_ranges, quantities = get_trend_data(selected_product, summary_df)
+
 
 # Create the trend line chart
 fig_trend = go.Figure()
