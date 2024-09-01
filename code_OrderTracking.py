@@ -291,6 +291,20 @@ fig_combined.update_layout(
     xaxis=dict(tickangle=-45)  # Rotate x-axis labels for better readability
 )
 
+        
+# Add a trace for the trend line
+trend_line_dates = [date for date,_ in average_quantities]
+trend_line_values = [quantity for _, quantity in average_quantities]
+
+
+fig_combined.add_trace(
+    go.Scatter(x=[date for date in trend_line_dates],
+               y=trend_line_values,
+               mode='lines+markers',
+               line=dict(color='red', dash='dash'),
+               name='Total Trend')
+)
+
 # Display the combined chart
 st.plotly_chart(fig_combined)
 
