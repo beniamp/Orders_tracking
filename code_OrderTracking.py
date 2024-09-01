@@ -37,6 +37,7 @@ formatted_total_net = "{:,}".format(total_net)
 # Clean up category data
 df_orders['Category'] = df_orders['Category'].replace('گوشی موبایل ', 'گوشی موبایل')
 categories = ['All Categories'] + df_orders['Category'].unique().tolist()
+brands = ['All Brands'] + df_orders
 
 # Formatting and cleaning date values
 df_orders['Date_Formatted'] = df_orders['Date_Formatted'].fillna('0000-00-00')
@@ -46,6 +47,8 @@ df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
 sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 
+# temp adjustments
+df_orders = df_orders[df_orders['ProductName'].str.contains('سامسونگ', na=False)]
 
 # Function to convert Persian date to Gregorian date
 def persian_to_gregorian(persian_date_str):
