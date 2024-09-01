@@ -386,5 +386,33 @@ fig_trend.update_layout(
     plot_bgcolor='white'
 )
 
+
+# Calculate the overall average quantity across all dates
+average_quantity = daily_quantity_combined['Quantity'].mean()
+
+# Ensure the x-axis is categorical
+fig_combined.update_xaxes(type='category')
+
+# Add a horizontal line for the average quantity
+fig_combined.add_shape(
+    type="line",
+    x0=0,  # Start from the first x position
+    x1=len(daily_quantity_combined) - 1,  # End at the last x position
+    y0=average_quantity,
+    y1=average_quantity,
+    line=dict(color="green", width=2, dash="dash"),  # Customize the line color and style
+)
+
+# Annotate the average line
+fig_combined.add_annotation(
+    x=len(daily_quantity_combined) - 1,  # Position annotation at the end of the line
+    y=average_quantity,
+    text=f"Average: {round(average_quantity, 2)}",
+    showarrow=False,
+    yshift=10,
+    font=dict(color="green")
+)
+
+
 # Display the trend line chart
 st.plotly_chart(fig_trend)
