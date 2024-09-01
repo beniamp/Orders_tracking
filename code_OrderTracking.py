@@ -301,7 +301,7 @@ fig_combined.update_layout(
 
 
 # Calculate the trend line (linear regression)
-x_values = len(daily_quantity_combined['Quantity'])
+x_values = np.arange(len(df['Quantity']))
 y_values = daily_quantity_combined['Quantity'].values
 coefficients = np.polyfit(x_values, y_values, 1)  # Linear regression
 trend_line = np.polyval(coefficients, x_values)
