@@ -46,7 +46,8 @@ df_orders = df_orders[df_orders['Date_Formatted'] != '0000-00-00']
 df_orders['Date_value'] = df_orders['Date_Formatted'].str.replace('-', '').astype(str)
 sorted_dates = sorted(df_orders['Date_Formatted'].unique())
 
-# temporary adjustments (selecting brands)df_orders = df_orders[df_orders['ProductName'].str.contains('سامسونگ', na=False)]
+# temporary adjustments (selecting brands)
+df_orders = df_orders[df_orders['ProductName'].str.contains('سامسونگ', na=False)]
 
 # Function to convert Persian date to Gregorian date
 def persian_to_gregorian(persian_date_str):
