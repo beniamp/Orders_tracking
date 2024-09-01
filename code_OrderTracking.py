@@ -365,30 +365,21 @@ date_ranges, quantities = get_trend_data(selected_product, summary_df)
 # Create the trend line chart
 fig_trend = go.Figure()
 
-# Add trace for the trend line
-fig_trend.add_trace(
-    go.Scatter(
-        x=date_ranges,
-        y=quantities,
-        mode='lines+markers',
-        line=dict(color='red', width=2),
-        marker=dict(size=8, color='black'),
-        name='Quantity Trend'
-    )
-)
-
-# Update layout of the chart
-fig_trend.update_layout(
-    title=f'Quantity Trend for {selected_product}',
-    xaxis_title='Date Range',
-    yaxis_title='Quantity',
-    xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
-    plot_bgcolor='white'
-)
-
-
 # Calculate the overall average quantity across all dates
 average_quantity = daily_quantity_combined['Quantity'].mean()
+
+# Create the bar chart
+fig_combined = px.bar(
+    daily_quantity_combined,
+    x='Date_Formatted',
+    y='Quantity',
+    title='Total Quantity per Day - All Date Ranges Combined',
+    color_discrete_sequence=['#636EFA']
+)
+
+# Add red vertical lines at the start of each date range
+for line_date in line_pos:
+    fig_combined.add_vline(x=line_date, line_dash="dash", line_color="red")
 
 # Ensure the x-axis is categorical
 fig_combined.update_xaxes(type='category')
@@ -413,6 +404,4 @@ fig_combined.add_annotation(
     font=dict(color="green")
 )
 
-
-# Display the trend line chart
 st.plotly_chart(fig_trend)
