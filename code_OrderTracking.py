@@ -321,8 +321,8 @@ average_quantity = daily_quantity_combined['Quantity'].mean()
 # Add a green horizontal line for the average quantity
 fig_combined.add_hline(y=average_quantity, line_color='green', line_width=2, line_dash='dash', annotation_text="Average", annotation_position="top right")
 
-# Add data labels on top of each bar
-fig_combined.update_traces(texttemplate='%{y}', textposition='outside')
+# Add data labels on top of each bar with valid textposition
+fig_combined.update_traces(texttemplate='%{y}', textposition='outside', selector=dict(type='bar'))
 
 # Update layout to ensure proper display
 fig_combined.update_layout(
