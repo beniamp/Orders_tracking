@@ -221,10 +221,8 @@ fig_combined = px.bar(
 
 # Add red vertical lines at the start of each date range
 for line_date in line_pos:
-    print(line_date)
-    
     # Add vertical line
-    fig_combined.add_vline(x=line_date, fillcolor='red')
+    fig_combined.add_vline(x=line_date, fillcolor='black')
 # Ensure the x-axis is categorical
 fig_combined.update_xaxes(type='category')
 
