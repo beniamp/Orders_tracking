@@ -294,6 +294,7 @@ fig_combined.update_layout(
     xaxis_title='Date',
     yaxis_title='Quantity',
     plot_bgcolor='white',
+    xaxis=dict(type='category'),
     xaxis=dict(tickangle=-45)  # Rotate x-axis labels for better readability
 )
 
