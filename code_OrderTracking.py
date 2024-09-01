@@ -302,9 +302,6 @@ fig_combined.update_layout(
 st.plotly_chart(fig_combined)
 
 
-# Display the combined chart with the red lines and the trend line
-st.plotly_chart(fig_combined)
-
 
 
 
