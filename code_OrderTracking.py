@@ -271,6 +271,35 @@ fig_combined.add_trace(
                name='Total Trend')
 )
 
+# Create a single bar chart with all the data
+fig_combined = px.bar(
+    daily_quantity_combined,
+    x='Date_Formatted',
+    y='Quantity',
+    title='Total Quantity per Day - All Date Ranges Combined',
+    color_discrete_sequence=['#636EFA']
+)
+
+# Calculate the average quantity
+average_quantity = daily_quantity_combined['Quantity'].mean()
+
+# Add a green horizontal line for the average quantity
+fig_combined.add_hline(y=average_quantity, line_color='green', line_width=2, line_dash='dash', annotation_text="Average", annotation_position="top right")
+
+# Add data labels on top of each bar
+fig_combined.update_traces(texttemplate='%{y}', textposition='outside')
+
+# Update layout to ensure proper display
+fig_combined.update_layout(
+    xaxis_title='Date',
+    yaxis_title='Quantity',
+    plot_bgcolor='white',
+    xaxis=dict(tickangle=-45)  # Rotate x-axis labels for better readability
+)
+
+# Display the combined chart
+st.plotly_chart(fig_combined)
+
 
 # Display the combined chart with the red lines and the trend line
 st.plotly_chart(fig_combined)
