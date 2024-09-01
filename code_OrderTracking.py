@@ -37,7 +37,6 @@ formatted_total_net = "{:,}".format(total_net)
 # Clean up category data
 df_orders['Category'] = df_orders['Category'].replace('گوشی موبایل ', 'گوشی موبایل')
 categories = ['All Categories'] + df_orders['Category'].unique().tolist()
-brands = ['All Brands'] + df_orders
 
 # Formatting and cleaning date values
 df_orders['Date_Formatted'] = df_orders['Date_Formatted'].fillna('0000-00-00')
