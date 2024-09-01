@@ -297,37 +297,40 @@ fig_combined.update_layout(
 # Rotate x-axis labels for better readability
 )
 
+# Convert categorical date to numeric index for trend line calculation
+numeric_dates = np.arange(len(daily_quantity_combined))
 
+# Calculate trend line (linear regression)
+z = np.polyfit(numeric_dates, daily_quantity_combined['Quantity'], 1)
+p = np.poly1d(z)
 
-
-# Calculate the trend line (linear regression)
-x_values = np.arange(len(df['Quantity']))
-y_values = daily_quantity_combined['Quantity'].values
-coefficients = np.polyfit(x_values, y_values, 1)  # Linear regression
-trend_line = np.polyval(coefficients, x_values)
-
-# Add the trend line as a scatter plot
+# Add trend line to the plot
 fig_combined.add_trace(
     go.Scatter(
-        x=daily_quantity_combined['Date_Formatted'], 
-        y=trend_line, 
-        mode='lines+markers', 
+        x=daily_quantity_combined['Date_Formatted'],
+        y=p(numeric_dates),
+        mode='lines',
         line=dict(color='red', dash='dash'),
         name='Trend Line'
     )
 )
 
-# Add vertical and horizontal lines as before if needed
+# Calculate the average quantity
+average_quantity = daily_quantity_combined['Quantity'].mean()
 
-# Display the combined chart
+# Add a green horizontal line for the average quantity
+fig_combined.add_hline(y=average_quantity, line_color='green', line_width=2, line_dash='dash', annotation_text="Average", annotation_position="top right")
+
+# Add data labels on top of each bar
+fig_combined.update_traces(texttemplate='%{y}', textposition='outside')
+
+# Update layout to ensure proper display
 fig_combined.update_layout(
     xaxis_title='Date',
     yaxis_title='Quantity',
     plot_bgcolor='white',
     xaxis=dict(type='category')
 )
-
-
 
 
 
