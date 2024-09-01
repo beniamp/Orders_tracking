@@ -362,17 +362,8 @@ def get_trend_data(product_name, summary_df):
 # Get trend data for the selected product
 date_ranges, quantities = get_trend_data(selected_product, summary_df)
 
-# Calculate the overall average quantity across all dates
-average_quantity = daily_quantity_combined['Quantity'].mean()
-
-# Create the bar chart
-fig_combined = px.bar(
-    daily_quantity_combined,
-    x='Date_Formatted',
-    y='Quantity',
-    title='Total Quantity per Day - All Date Ranges Combined',
-    color_discrete_sequence=['#636EFA']
-)
+# Create an empty figure
+fig_combined = go.Figure()
 
 # Add red vertical lines at the start of each date range
 for line_date in line_pos:
@@ -381,28 +372,17 @@ for line_date in line_pos:
 # Ensure the x-axis is categorical
 fig_combined.update_xaxes(type='category')
 
-# Add a horizontal line for the average quantity
-fig_combined.add_shape(
-    type="line",
-    x0=daily_quantity_combined['Date_Formatted'].iloc[0],  # Start from the first x position (first date)
-    x1=daily_quantity_combined['Date_Formatted'].iloc[-1],  # End at the last x position (last date)
-    y0=average_quantity,
-    y1=average_quantity,
-    xref='x',  # Reference to the x-axis (dates)
-    yref='y',  # Reference to the y-axis (quantities)
-    line=dict(color="green", width=2, dash="dash"),  # Customize the line color and style
+# Set the title and layout options (like removing gridlines and background)
+fig_combined.update_layout(
+    title='Red Vertical Lines for Date Ranges',
+    xaxis_title='Date',
+    yaxis_title='Quantity',
+    showlegend=False,
+    plot_bgcolor='white',  # Set the background color to white to remove gridlines
+    xaxis=dict(showline=True, linewidth=1, linecolor='black'),  # Customize x-axis line
+    yaxis=dict(showline=True, linewidth=1, linecolor='black'),  # Customize y-axis line
 )
 
-# Annotate the average line
-fig_combined.add_annotation(
-    x=daily_quantity_combined['Date_Formatted'].iloc[-1],  # Position annotation at the last date
-    y=average_quantity,
-    text=f"Average: {round(average_quantity, 2)}",
-    showarrow=False,
-    yshift=10,
-    font=dict(color="green")
-)
-
-# Display the combined chart with the red lines and the average line
+# Display the chart with only red lines
 st.plotly_chart(fig_combined)
 
