@@ -302,14 +302,14 @@ fig_combined.update_layout(
 
 # Calculate the trend line (linear regression)
 x_values = len(daily_quantity_combined['Quantity'])
-y_values = df['Quantity'].values
+y_values = daily_quantity_combined['Quantity'].values
 coefficients = np.polyfit(x_values, y_values, 1)  # Linear regression
 trend_line = np.polyval(coefficients, x_values)
 
 # Add the trend line as a scatter plot
 fig_combined.add_trace(
     go.Scatter(
-        x=df['Date_Formatted'], 
+        x=daily_quantity_combined['Date_Formatted'], 
         y=trend_line, 
         mode='lines+markers', 
         line=dict(color='red', dash='dash'),
