@@ -362,9 +362,6 @@ def get_trend_data(product_name, summary_df):
 # Get trend data for the selected product
 date_ranges, quantities = get_trend_data(selected_product, summary_df)
 
-# Create the trend line chart
-fig_trend = go.Figure()
-
 # Calculate the overall average quantity across all dates
 average_quantity = daily_quantity_combined['Quantity'].mean()
 
@@ -387,16 +384,18 @@ fig_combined.update_xaxes(type='category')
 # Add a horizontal line for the average quantity
 fig_combined.add_shape(
     type="line",
-    x0=0,  # Start from the first x position
-    x1=len(daily_quantity_combined) - 1,  # End at the last x position
+    x0=daily_quantity_combined['Date_Formatted'].iloc[0],  # Start from the first x position (first date)
+    x1=daily_quantity_combined['Date_Formatted'].iloc[-1],  # End at the last x position (last date)
     y0=average_quantity,
     y1=average_quantity,
+    xref='x',  # Reference to the x-axis
+    yref='y',  # Reference to the y-axis
     line=dict(color="green", width=2, dash="dash"),  # Customize the line color and style
 )
 
 # Annotate the average line
 fig_combined.add_annotation(
-    x=len(daily_quantity_combined) - 1,  # Position annotation at the end of the line
+    x=daily_quantity_combined['Date_Formatted'].iloc[-1],  # Position annotation at the last date
     y=average_quantity,
     text=f"Average: {round(average_quantity, 2)}",
     showarrow=False,
@@ -404,4 +403,5 @@ fig_combined.add_annotation(
     font=dict(color="green")
 )
 
+# Display the combined chart with the red lines and the average line
 st.plotly_chart(fig_combined)
