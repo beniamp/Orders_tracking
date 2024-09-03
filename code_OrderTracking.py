@@ -150,7 +150,7 @@ def format_persian_date(date_str):
 
 
 # Create a widget to adjust the number of divisions
-num_divisions = st.slider("Select Number of Divisions", min_value=1, max_value=50, value=20)
+num_divisions = st.slider("Select Number of Divisions", min_value=1, max_value=100, value=50)
 
 # Create additional date ranges based on the selected number of divisions
 additional_ranges = []
