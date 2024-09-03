@@ -281,7 +281,7 @@ fig_combined = px.bar(
 )
 
 # Calculate the average quantity
-average_quantity = daily_quantity_combined['Quantity'].mean()
+average_quantity = daily_quantity_combined['Quantity'].median()
 
 # Add a green horizontal line for the average quantity
 fig_combined.add_hline(y=average_quantity, line_color='green', line_width=2, line_dash='dash', annotation_text="Average", annotation_position="top right")
