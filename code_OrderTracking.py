@@ -22,7 +22,7 @@ image = Image.open('dgland_icon.png')
 st.image(image, width=100)  # Adjust width as needed
 
 # Load dataset
-df_orders = pd.read_csv('Order.csv')
+df_orders = pd.read_csv('Orders.csv')
 
 # Calculate metrics
 total_sales = df_orders['TotalPrice'].sum()
